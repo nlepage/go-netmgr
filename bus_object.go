@@ -34,3 +34,37 @@ func (o BusObject) Call(method string, res interface{}, args ...interface{}) err
 	}
 	return call.Err
 }
+
+func (o BusObject) Signal(member string, out chan<- []interface{}) error {
+	if err := o.conn.AddMatchSignal(o.MatchSignal(member)...); err != nil {
+		return err
+	}
+
+	in := make(chan *dbus.Signal)
+	o.conn.Signal(in)
+
+	name := o.iface + "." + member
+	path := o.o.Path()
+
+	go func() {
+		for s := range in {
+			if s.Name != name {
+				continue
+			}
+			if s.Path != path {
+				continue
+			}
+			out <- s.Body
+		}
+	}()
+
+	return nil
+}
+
+func (o BusObject) MatchSignal(member string) []dbus.MatchOption {
+	return []dbus.MatchOption{
+		dbus.WithMatchInterface(o.iface),
+		dbus.WithMatchMember(member),
+		dbus.WithMatchObjectPath(o.o.Path()),
+	}
+}

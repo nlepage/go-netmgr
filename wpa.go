@@ -12,6 +12,7 @@ type WPA BusObject
 
 func SystemWPA() (WPA, error) {
 	conn, err := dbus.SystemBus()
+	dbus.WithContext(nil)
 	if err != nil {
 		return WPA{nil, nil, ""}, err
 	}

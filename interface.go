@@ -69,23 +69,16 @@ func (iface Interface) Scan(options ScanOptions) error {
 	return BusObject(iface).Call("Scan", nil, options.toMap())
 }
 
-func (iface Interface) ScanDone(ch chan<- bool) error {
-	if err := BusObject(iface).conn.AddMatchSignal(
-		dbus.WithMatchObjectPath(iface.o.Path()),
-		dbus.WithMatchInterface(iface.iface),
-		dbus.WithMatchMember("ScanDone"),
-	); err != nil {
+func (iface Interface) ScanDone(out chan<- bool) error {
+	in := make(chan []interface{})
+
+	if err := BusObject(iface).Signal("ScanDone", in); err != nil {
 		return err
 	}
 
-	sch := make(chan *dbus.Signal)
-	iface.conn.Signal(sch)
-
 	go func() {
-		for s := range sch {
-			if s.Name == "fi.w1.wpa_supplicant1.Interface.ScanDone" {
-				ch <- s.Body[0].(bool)
-			}
+		for s := range in {
+			out <- s[0].(bool)
 		}
 	}()
 
