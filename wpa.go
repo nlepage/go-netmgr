@@ -1,7 +1,11 @@
 package wpa
 
 import (
-	"github.com/godbus/dbus"
+	"github.com/godbus/dbus/v5"
+)
+
+const (
+	destination = "fi.w1.wpa_supplicant1"
 )
 
 type WPA BusObject

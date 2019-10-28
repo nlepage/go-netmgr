@@ -1,7 +1,7 @@
 package wpa
 
 import (
-	"github.com/godbus/dbus"
+	"github.com/godbus/dbus/v5"
 )
 
 type BusObject struct {
@@ -13,7 +13,7 @@ type BusObject struct {
 func NewBusObject(conn *dbus.Conn, path dbus.ObjectPath, iface string) BusObject {
 	return BusObject{
 		conn,
-		conn.Object("fi.w1.wpa_supplicant1", path),
+		conn.Object(destination, path),
 		iface,
 	}
 }
@@ -25,4 +25,12 @@ func (o BusObject) GetProperty(name string) (interface{}, error) {
 	}
 
 	return v.Value(), nil
+}
+
+func (o BusObject) Call(method string, res interface{}, args ...interface{}) error {
+	call := o.o.Call(o.iface+"."+method, 0, args...)
+	if res != nil {
+		return call.Store(res)
+	}
+	return call.Err
 }

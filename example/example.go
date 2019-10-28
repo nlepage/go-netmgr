@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	wpa "github.com/nlepage/go-wpa"
 )
@@ -39,5 +40,25 @@ func main() {
 
 			fmt.Printf("\t%#v\n", props)
 		}
+
+		ch := make(chan bool)
+		if err := iface.ScanDone(ch); err != nil {
+			panic(err)
+		}
+		go func() {
+			if ok := <-ch; ok {
+				fmt.Println("Scan Done !")
+
+			}
+		}()
+
+		if err := iface.Scan(wpa.ScanOptions{
+			Type: wpa.ScanActive,
+		}); err != nil {
+			panic(err)
+		}
+		fmt.Println("Scanned!")
 	}
+
+	time.Sleep(time.Minute)
 }
