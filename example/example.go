@@ -48,7 +48,6 @@ func main() {
 		go func() {
 			if ok := <-ch; ok {
 				fmt.Println("Scan Done !")
-
 			}
 		}()
 

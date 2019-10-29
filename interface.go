@@ -40,11 +40,15 @@ const (
 	ScanPassive ScanType = "passive"
 )
 
+type ScanChannel struct {
+	Center, Witdh uint
+}
+
 type ScanOptions struct {
 	Type      ScanType
 	SSIDs     [][]byte
 	IEs       [][]byte
-	Channels  [][2]uint
+	Channels  []ScanChannel
 	AllowRoam *bool
 }
 
