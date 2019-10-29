@@ -8,13 +8,15 @@ type BusObject struct {
 	conn  *dbus.Conn
 	o     dbus.BusObject
 	iface string
+	sm    *SignalManager
 }
 
-func NewBusObject(conn *dbus.Conn, path dbus.ObjectPath, iface string) BusObject {
+func NewBusObject(conn *dbus.Conn, path dbus.ObjectPath, iface string, sm *SignalManager) BusObject {
 	return BusObject{
 		conn,
 		conn.Object(destination, path),
 		iface,
+		sm,
 	}
 }
 
@@ -36,29 +38,7 @@ func (o BusObject) Call(method string, res interface{}, args ...interface{}) err
 }
 
 func (o BusObject) Signal(member string, out chan<- []interface{}) error {
-	if err := o.conn.AddMatchSignal(o.MatchSignal(member)...); err != nil {
-		return err
-	}
-
-	in := make(chan *dbus.Signal)
-	o.conn.Signal(in)
-
-	name := o.iface + "." + member
-	path := o.o.Path()
-
-	go func() {
-		for s := range in {
-			if s.Name != name {
-				continue
-			}
-			if s.Path != path {
-				continue
-			}
-			out <- s.Body
-		}
-	}()
-
-	return nil
+	return o.sm.Signal(o.iface, member, o.o.Path(), out)
 }
 
 func (o BusObject) MatchSignal(member string) []dbus.MatchOption {

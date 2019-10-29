@@ -14,13 +14,13 @@ func SystemWPA() (WPA, error) {
 	conn, err := dbus.SystemBus()
 	dbus.WithContext(nil)
 	if err != nil {
-		return WPA{nil, nil, ""}, err
+		return WPA{nil, nil, "", nil}, err
 	}
 	return BusWPA(conn), nil
 }
 
 func BusWPA(conn *dbus.Conn) WPA {
-	return WPA(NewBusObject(conn, "/fi/w1/wpa_supplicant1", "fi.w1.wpa_supplicant1"))
+	return WPA(NewBusObject(conn, "/fi/w1/wpa_supplicant1", "fi.w1.wpa_supplicant1", NewSignalManager(conn)))
 }
 
 func (wpa WPA) Close() error {
@@ -37,7 +37,7 @@ func (wpa WPA) Interfaces() ([]Interface, error) {
 	ifaces := make([]Interface, 0, len(paths))
 
 	for _, path := range paths {
-		ifaces = append(ifaces, Interface(NewBusObject(wpa.conn, path, "fi.w1.wpa_supplicant1.Interface")))
+		ifaces = append(ifaces, Interface(NewBusObject(wpa.conn, path, "fi.w1.wpa_supplicant1.Interface", wpa.sm)))
 	}
 
 	return ifaces, nil

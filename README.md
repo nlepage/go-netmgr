@@ -13,8 +13,6 @@
 
 > Go bindings for wpa_supplicant D-Bus API
 
-### 🏠 [Homepage](https://github.com/nlepage/go-wpa)
-
 ## Install
 
 ```sh

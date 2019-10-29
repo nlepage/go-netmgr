@@ -25,7 +25,7 @@ func (iface Interface) Networks() ([]Network, error) {
 	nets := make([]Network, 0, len(paths))
 
 	for _, path := range paths {
-		nets = append(nets, Network(NewBusObject(iface.conn, path, "fi.w1.wpa_supplicant1.Network")))
+		nets = append(nets, Network(NewBusObject(iface.conn, path, "fi.w1.wpa_supplicant1.Network", iface.sm)))
 	}
 
 	return nets, nil
