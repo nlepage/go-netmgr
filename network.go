@@ -6,6 +6,8 @@ import (
 	"github.com/nlepage/go-wpa/internal/dbusutil"
 )
 
+const networkInterface = "fi.w1.wpa_supplicant1.Network"
+
 type Network dbusutil.BusObject
 
 func (net Network) Enabled() (bool, error) {

@@ -15,6 +15,8 @@ type BusObject struct {
 	sm    *SignalManager
 }
 
+var NilBusObject = BusObject{}
+
 func NewBusObject(conn *dbus.Conn, path dbus.ObjectPath, iface string, sm *SignalManager) BusObject {
 	return BusObject{
 		conn,
@@ -51,4 +53,8 @@ func (o BusObject) NewBusObject(path dbus.ObjectPath, iface string) BusObject {
 
 func (o BusObject) Conn() *dbus.Conn {
 	return o.conn
+}
+
+func (o BusObject) Path() dbus.ObjectPath {
+	return o.o.Path()
 }

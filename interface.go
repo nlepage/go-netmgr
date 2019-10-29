@@ -6,6 +6,8 @@ import (
 	"github.com/nlepage/go-wpa/internal/dbusutil"
 )
 
+const interfaceInterface = "fi.w1.wpa_supplicant1.Interface"
+
 type Interface dbusutil.BusObject
 
 func (iface Interface) Ifname() (string, error) {
@@ -27,7 +29,7 @@ func (iface Interface) Networks() ([]Network, error) {
 	nets := make([]Network, 0, len(paths))
 
 	for _, path := range paths {
-		nets = append(nets, Network(dbusutil.BusObject(iface).NewBusObject(path, "fi.w1.wpa_supplicant1.Network")))
+		nets = append(nets, iface.newNetwork(path))
 	}
 
 	return nets, nil
@@ -89,4 +91,8 @@ func (iface Interface) ScanDone(out chan<- bool) error {
 	}()
 
 	return nil
+}
+
+func (iface Interface) newNetwork(path dbus.ObjectPath) Network {
+	return Network(dbusutil.BusObject(iface).NewBusObject(path, networkInterface))
 }

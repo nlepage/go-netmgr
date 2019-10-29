@@ -1,7 +1,7 @@
 <h1 align="center">Welcome to go-wpa 👋</h1>
 <p>
   <a href="https://godoc.org/github.com/nlepage/go-wpa" target="_blank">
-    <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" />
+    <img alt="Documentation" src="https://godoc.org/github.com/nlepage/go-wpa?status.svg" />
   </a>
   <a href="https://spdx.org/licenses/Apache-2.0.html" target="_blank">
     <img alt="License: Apache 2.0" src="https://img.shields.io/badge/License-Apache 2.0-yellow.svg" />
