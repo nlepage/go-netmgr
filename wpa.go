@@ -2,33 +2,30 @@ package wpa
 
 import (
 	"github.com/godbus/dbus/v5"
+
+	"github.com/nlepage/go-wpa/internal/dbusutil"
 )
 
-const (
-	destination = "fi.w1.wpa_supplicant1"
-)
-
-type WPA BusObject
+type WPA dbusutil.BusObject
 
 func SystemWPA() (WPA, error) {
 	conn, err := dbus.SystemBus()
-	dbus.WithContext(nil)
 	if err != nil {
-		return WPA{nil, nil, "", nil}, err
+		return WPA(dbusutil.NewBusObject(nil, "", "", nil)), err
 	}
 	return BusWPA(conn), nil
 }
 
 func BusWPA(conn *dbus.Conn) WPA {
-	return WPA(NewBusObject(conn, "/fi/w1/wpa_supplicant1", "fi.w1.wpa_supplicant1", NewSignalManager(conn)))
+	return WPA(dbusutil.NewBusObject(conn, "/fi/w1/wpa_supplicant1", "fi.w1.wpa_supplicant1", dbusutil.NewSignalManager(conn)))
 }
 
 func (wpa WPA) Close() error {
-	return wpa.conn.Close()
+	return dbusutil.BusObject(wpa).Conn().Close()
 }
 
 func (wpa WPA) Interfaces() ([]Interface, error) {
-	v, err := BusObject(wpa).GetProperty("Interfaces")
+	v, err := dbusutil.BusObject(wpa).GetProperty("Interfaces")
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +34,7 @@ func (wpa WPA) Interfaces() ([]Interface, error) {
 	ifaces := make([]Interface, 0, len(paths))
 
 	for _, path := range paths {
-		ifaces = append(ifaces, Interface(NewBusObject(wpa.conn, path, "fi.w1.wpa_supplicant1.Interface", wpa.sm)))
+		ifaces = append(ifaces, Interface(dbusutil.BusObject(wpa).NewBusObject(path, "fi.w1.wpa_supplicant1.Interface")))
 	}
 
 	return ifaces, nil

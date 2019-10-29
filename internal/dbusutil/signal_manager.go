@@ -1,4 +1,4 @@
-package wpa
+package dbusutil
 
 import (
 	"sync"

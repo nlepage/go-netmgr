@@ -2,12 +2,14 @@ package wpa
 
 import (
 	"github.com/godbus/dbus/v5"
+
+	"github.com/nlepage/go-wpa/internal/dbusutil"
 )
 
-type Network BusObject
+type Network dbusutil.BusObject
 
 func (net Network) Enabled() (bool, error) {
-	v, err := BusObject(net).GetProperty("Enabled")
+	v, err := dbusutil.BusObject(net).GetProperty("Enabled")
 	if err != nil {
 		return false, err
 	}
@@ -16,7 +18,7 @@ func (net Network) Enabled() (bool, error) {
 }
 
 func (net Network) Properties() (map[string]interface{}, error) {
-	v, err := BusObject(net).GetProperty("Properties")
+	v, err := dbusutil.BusObject(net).GetProperty("Properties")
 	if err != nil {
 		return nil, err
 	}

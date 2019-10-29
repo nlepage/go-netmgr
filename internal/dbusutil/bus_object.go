@@ -1,7 +1,11 @@
-package wpa
+package dbusutil
 
 import (
 	"github.com/godbus/dbus/v5"
+)
+
+const (
+	destination = "fi.w1.wpa_supplicant1"
 )
 
 type BusObject struct {
@@ -47,4 +51,12 @@ func (o BusObject) MatchSignal(member string) []dbus.MatchOption {
 		dbus.WithMatchMember(member),
 		dbus.WithMatchObjectPath(o.o.Path()),
 	}
+}
+
+func (o BusObject) NewBusObject(path dbus.ObjectPath, iface string) BusObject {
+	return NewBusObject(o.conn, path, iface, o.sm)
+}
+
+func (o BusObject) Conn() *dbus.Conn {
+	return o.conn
 }

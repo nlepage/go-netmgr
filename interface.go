@@ -2,12 +2,14 @@ package wpa
 
 import (
 	"github.com/godbus/dbus/v5"
+
+	"github.com/nlepage/go-wpa/internal/dbusutil"
 )
 
-type Interface BusObject
+type Interface dbusutil.BusObject
 
 func (iface Interface) Ifname() (string, error) {
-	v, err := BusObject(iface).GetProperty("Ifname")
+	v, err := dbusutil.BusObject(iface).GetProperty("Ifname")
 	if err != nil {
 		return "", err
 	}
@@ -16,7 +18,7 @@ func (iface Interface) Ifname() (string, error) {
 }
 
 func (iface Interface) Networks() ([]Network, error) {
-	v, err := BusObject(iface).GetProperty("Networks")
+	v, err := dbusutil.BusObject(iface).GetProperty("Networks")
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +27,7 @@ func (iface Interface) Networks() ([]Network, error) {
 	nets := make([]Network, 0, len(paths))
 
 	for _, path := range paths {
-		nets = append(nets, Network(NewBusObject(iface.conn, path, "fi.w1.wpa_supplicant1.Network", iface.sm)))
+		nets = append(nets, Network(dbusutil.BusObject(iface).NewBusObject(path, "fi.w1.wpa_supplicant1.Network")))
 	}
 
 	return nets, nil
@@ -66,13 +68,13 @@ func (so ScanOptions) toMap() map[string]interface{} {
 }
 
 func (iface Interface) Scan(options ScanOptions) error {
-	return BusObject(iface).Call("Scan", nil, options.toMap())
+	return dbusutil.BusObject(iface).Call("Scan", nil, options.toMap())
 }
 
 func (iface Interface) ScanDone(out chan<- bool) error {
 	in := make(chan []interface{})
 
-	if err := BusObject(iface).Signal("ScanDone", in); err != nil {
+	if err := dbusutil.BusObject(iface).Signal("ScanDone", in); err != nil {
 		return err
 	}
 
