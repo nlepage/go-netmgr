@@ -45,14 +45,6 @@ func (o BusObject) Signal(member string, out chan<- []interface{}) error {
 	return o.sm.Signal(o.iface, member, o.o.Path(), out)
 }
 
-func (o BusObject) MatchSignal(member string) []dbus.MatchOption {
-	return []dbus.MatchOption{
-		dbus.WithMatchInterface(o.iface),
-		dbus.WithMatchMember(member),
-		dbus.WithMatchObjectPath(o.o.Path()),
-	}
-}
-
 func (o BusObject) NewBusObject(path dbus.ObjectPath, iface string) BusObject {
 	return NewBusObject(o.conn, path, iface, o.sm)
 }
