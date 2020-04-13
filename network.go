@@ -3,7 +3,7 @@ package wpa
 import (
 	"github.com/godbus/dbus/v5"
 
-	"github.com/nlepage/go-wpa/internal/dbusutil"
+	"github.com/nlepage/go-netmgr/internal/dbusutil"
 )
 
 const networkInterface = "fi.w1.wpa_supplicant1.Network"

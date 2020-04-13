@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	wpa "github.com/nlepage/go-wpa"
+	wpa "github.com/nlepage/go-netmgr"
 )
 
 func main() {

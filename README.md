@@ -1,7 +1,7 @@
-<h1 align="center">Welcome to go-wpa 👋</h1>
+<h1 align="center">Welcome to go-netmgr 👋</h1>
 <p>
-  <a href="https://godoc.org/github.com/nlepage/go-wpa" target="_blank">
-    <img alt="Documentation" src="https://godoc.org/github.com/nlepage/go-wpa?status.svg" />
+  <a href="https://godoc.org/github.com/nlepage/go-netmgr" target="_blank">
+    <img alt="Documentation" src="https://godoc.org/github.com/nlepage/go-netmgr?status.svg" />
   </a>
   <a href="https://spdx.org/licenses/Apache-2.0.html" target="_blank">
     <img alt="License: Apache 2.0" src="https://img.shields.io/badge/License-Apache 2.0-yellow.svg" />
@@ -11,47 +11,17 @@
   </a>
 </p>
 
-> Go bindings for wpa_supplicant D-Bus API
+> Go bindings for [NetworkManager D-Bus API](https://developer.gnome.org/NetworkManager/stable/spec.html)
 
 ## Install
 
 ```sh
-go get -u github.com/nlepage/go-wpa
+go get -u github.com/nlepage/go-netmgr
 ```
 
 ## Usage
 
-```go
-package main
-
-import (
-	"fmt"
-
-	wpa "github.com/nlepage/go-wpa"
-)
-
-func main() {
-	w, err := wpa.SystemWPA()
-	if err != nil {
-		panic(err)
-	}
-	defer w.Close()
-
-	ifaces, err := w.Interfaces()
-	if err != nil {
-		panic(err)
-	}
-
-	for i, iface := range ifaces {
-		ifname, err := iface.Ifname()
-		if err != nil {
-			panic(err)
-		}
-
-		fmt.Printf("%d: %s\n", i, ifname)
-	}
-}
-```
+🚧 Comin soon...
 
 ## Author
 
@@ -62,7 +32,7 @@ func main() {
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/nlepage/go-wpa/issues).
+Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/nlepage/go-netmgr/issues).
 
 ## Show your support
 

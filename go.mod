@@ -1,5 +1,5 @@
-module github.com/nlepage/go-wpa
+module github.com/nlepage/go-netmgr
 
-go 1.13
+go 1.12
 
 require github.com/godbus/dbus/v5 v5.0.3
