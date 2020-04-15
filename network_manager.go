@@ -4,16 +4,14 @@ import (
 	"github.com/godbus/dbus/v5"
 )
 
-const (
-	// Destination of NetworkManager D-Bus API.
-	Destination = "org.freedesktop.NetworkManager"
+// Destination of NetworkManager D-Bus API.
+const Destination = "org.freedesktop.NetworkManager"
 
-	// NetworkManagerPath is the Connection Manager path.
-	NetworkManagerPath = "/org/freedesktop/NetworkManager"
+// NetworkManagerPath is the Connection Manager path.
+const NetworkManagerPath = "/org/freedesktop/NetworkManager"
 
-	// NetworkManagerInterface is the Connection Manager interface.
-	NetworkManagerInterface = "org.freedesktop.NetworkManager"
-)
+// NetworkManagerInterface is the Connection Manager interface.
+const NetworkManagerInterface = "org.freedesktop.NetworkManager"
 
 type (
 	// NetworkManager is the Connection Manager.
@@ -48,6 +46,11 @@ type (
 		//
 		// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.ActivateConnection for more information.
 		ActivateConnection(connection interface{}, device interface{}, specificObject interface{}) (ConnectionActive, error)
+
+		// DeactivateConnection deactivates an active connection.
+		//
+		// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.DeactivateConnection for more information.
+		DeactivateConnection(activeConnection interface{}) error
 	}
 
 	networkManager struct {
@@ -175,7 +178,18 @@ func (nm *networkManager) ActivateConnection(connection interface{}, device inte
 		return nil, err
 	}
 
-	return &connectionActive{newBusObject(nm.conn, path)}, nil // FIXME introspect type
+	ca := connectionActive{newBusObject(nm.conn, path)}
+
+	isVPN, err := ca.Vpn()
+	if err != nil {
+		return nil, err
+	}
+
+	if isVPN {
+		return &vpnConnection{ca}, nil
+	}
+
+	return &ca, nil
 }
 
 // ActivateConnection activates a connection using the supplied device.
@@ -187,6 +201,26 @@ func ActivateConnection(connection interface{}, device interface{}, specificObje
 		return nil, err
 	}
 	return nm.ActivateConnection(connection, device, specificObject)
+}
+
+func (nm *networkManager) DeactivateConnection(activeConnection interface{}) error {
+	activeConnectionPath, err := objectPath(activeConnection)
+	if err != nil {
+		return err
+	}
+
+	return nm.callAndStore(NetworkManagerInterface+".DeactivateConnection", args{activeConnectionPath}, nil)
+}
+
+// DeactivateConnection deactivates an active connection.
+//
+// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.DeactivateConnection for more information.
+func DeactivateConnection(activeConnection interface{}) error {
+	nm, err := SystemNetworkManager()
+	if err != nil {
+		return err
+	}
+	return nm.DeactivateConnection(activeConnection)
 }
 
 func (nm *networkManager) device(path dbus.ObjectPath) Device {

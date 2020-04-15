@@ -4,9 +4,8 @@ import (
 	"github.com/godbus/dbus/v5"
 )
 
-const (
-	DeviceIface = "org.freedesktop.NetworkManager.Device"
-)
+// DeviceIface is the base Device interface.
+const DeviceIface = "org.freedesktop.NetworkManager.Device"
 
 type (
 	// Device represents a device.

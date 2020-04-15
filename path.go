@@ -10,6 +10,9 @@ type pather interface {
 	Path() dbus.ObjectPath
 }
 
+// dbus.BusObject should include pather
+var _ pather = dbus.BusObject(nil)
+
 func objectPath(v interface{}) (dbus.ObjectPath, error) {
 	switch p := v.(type) {
 	case dbus.ObjectPath:
