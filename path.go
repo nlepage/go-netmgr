@@ -1,4 +1,4 @@
-package dbusutil
+package netmgr
 
 import (
 	"fmt"
@@ -6,17 +6,17 @@ import (
 	"github.com/godbus/dbus/v5"
 )
 
-type Pather interface {
+type pather interface {
 	Path() dbus.ObjectPath
 }
 
-func ObjectPath(v interface{}) (dbus.ObjectPath, error) {
+func objectPath(v interface{}) (dbus.ObjectPath, error) {
 	switch p := v.(type) {
 	case dbus.ObjectPath:
 		return p, nil
 	case string:
 		return dbus.ObjectPath(p), nil
-	case Pather:
+	case pather:
 		return p.Path(), nil
 	case nil:
 		return "/", nil

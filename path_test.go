@@ -1,4 +1,4 @@
-package dbusutil
+package netmgr
 
 import (
 	"errors"
@@ -14,9 +14,9 @@ func errEqual(err1, err2 error) bool {
 	return err2 != nil && err1.Error() == err2.Error()
 }
 
-type PatherMock struct{ path dbus.ObjectPath }
+type patherMock struct{ path dbus.ObjectPath }
 
-func (pm PatherMock) Path() dbus.ObjectPath {
+func (pm patherMock) Path() dbus.ObjectPath {
 	return pm.path
 }
 
@@ -28,7 +28,7 @@ func TestObjectPath(t *testing.T) {
 	}{
 		{"test1", dbus.ObjectPath("test1"), nil},
 		{dbus.ObjectPath("test2"), dbus.ObjectPath("test2"), nil},
-		{PatherMock{"test3"}, dbus.ObjectPath("test3"), nil},
+		{patherMock{"test3"}, dbus.ObjectPath("test3"), nil},
 		{nil, "/", nil},
 		{true, "", errors.New("Type bool incompatible with dbus.ObjectPath")},
 	}

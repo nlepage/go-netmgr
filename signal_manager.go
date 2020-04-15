@@ -1,4 +1,4 @@
-package dbusutil
+package netmgr
 
 import (
 	"sync"
@@ -11,21 +11,21 @@ type signalKey struct {
 	path dbus.ObjectPath
 }
 
-type SignalManager struct {
+type signalManager struct {
 	conn *dbus.Conn
 	l    sync.Mutex
 	in   <-chan *dbus.Signal
 	outs map[signalKey]map[chan<- []interface{}]bool
 }
 
-func NewSignalManager(conn *dbus.Conn) *SignalManager {
-	return &SignalManager{
+func newSignalManager(conn *dbus.Conn) *signalManager {
+	return &signalManager{
 		conn: conn,
 		outs: make(map[signalKey]map[chan<- []interface{}]bool),
 	}
 }
 
-func (sm *SignalManager) Signal(iface, member string, path dbus.ObjectPath, out chan<- []interface{}) error {
+func (sm *signalManager) Signal(iface, member string, path dbus.ObjectPath, out chan<- []interface{}) error {
 	sm.l.Lock()
 	defer sm.l.Unlock()
 
@@ -55,7 +55,7 @@ func (sm *SignalManager) Signal(iface, member string, path dbus.ObjectPath, out 
 	return nil
 }
 
-func (sm *SignalManager) pipe() {
+func (sm *signalManager) pipe() {
 	for {
 		select {
 		case s := <-sm.in:
@@ -65,7 +65,7 @@ func (sm *SignalManager) pipe() {
 	}
 }
 
-func (sm *SignalManager) pipeSignal(s *dbus.Signal) {
+func (sm *signalManager) pipeSignal(s *dbus.Signal) {
 	sm.l.Lock()
 	defer sm.l.Unlock()
 
