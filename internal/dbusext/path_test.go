@@ -1,4 +1,4 @@
-package netmgr
+package dbusext
 
 import (
 	"errors"
@@ -34,7 +34,7 @@ func TestObjectPath(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		p, err := objectPath(test.v)
+		p, err := ObjectPath(test.v)
 		if p != test.p || !errEqual(err, test.err) {
 			t.Errorf("ObjectPath(%#v) returned (%#v, %#v), expected (%#v, %#v)", test.v, p, err, test.p, test.err)
 		}

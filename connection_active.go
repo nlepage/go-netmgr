@@ -2,6 +2,8 @@ package netmgr
 
 import (
 	"github.com/godbus/dbus/v5"
+
+	"github.com/nlepage/go-netmgr/internal/dbusext"
 )
 
 // ConnectionActiveIface is the Active Connection interface.
@@ -23,12 +25,12 @@ type (
 	}
 
 	connectionActive struct {
-		busObject
+		dbusext.BusObject
 	}
 )
 
 var _ ConnectionActive = (*connectionActive)(nil)
 
 func (ca *connectionActive) Vpn() (bool, error) {
-	return ca.getBoolProperty(ConnectionActiveIface + ".Vpn")
+	return ca.GetBoolProperty(ConnectionActiveIface + ".Vpn")
 }

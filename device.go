@@ -2,6 +2,8 @@ package netmgr
 
 import (
 	"github.com/godbus/dbus/v5"
+
+	"github.com/nlepage/go-netmgr/internal/dbusext"
 )
 
 // DeviceIface is the base Device interface.
@@ -46,32 +48,32 @@ type (
 	}
 
 	device struct {
-		busObject
+		dbusext.BusObject
 	}
 )
 
 var _ Device = (*device)(nil)
 
 func (d *device) Udi() (string, error) {
-	return d.getStringProperty(DeviceIface + ".Udi")
+	return d.GetStringProperty(DeviceIface + ".Udi")
 }
 
 func (d *device) Interface() (string, error) {
-	return d.getStringProperty(DeviceIface + ".Interface")
+	return d.GetStringProperty(DeviceIface + ".Interface")
 }
 
 func (d *device) IPInterface() (string, error) {
-	return d.getStringProperty(DeviceIface + ".IpInterface")
+	return d.GetStringProperty(DeviceIface + ".IpInterface")
 }
 
 func (d *device) Driver() (string, error) {
-	return d.getStringProperty(DeviceIface + ".Driver")
+	return d.GetStringProperty(DeviceIface + ".Driver")
 }
 
 func (d *device) DriverVersion() (string, error) {
-	return d.getStringProperty(DeviceIface + ".DriverVersion")
+	return d.GetStringProperty(DeviceIface + ".DriverVersion")
 }
 
 func (d *device) FirmwareVersion() (string, error) {
-	return d.getStringProperty(DeviceIface + ".FirmwareVersion")
+	return d.GetStringProperty(DeviceIface + ".FirmwareVersion")
 }

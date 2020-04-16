@@ -1,4 +1,4 @@
-package netmgr
+package dbusext
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ type pather interface {
 // dbus.BusObject should include pather
 var _ pather = dbus.BusObject(nil)
 
-func objectPath(v interface{}) (dbus.ObjectPath, error) {
+func ObjectPath(v interface{}) (dbus.ObjectPath, error) {
 	switch p := v.(type) {
 	case dbus.ObjectPath:
 		return p, nil

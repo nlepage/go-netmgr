@@ -1,4 +1,4 @@
-package netmgr
+package dbusext
 
 import (
 	"sync"

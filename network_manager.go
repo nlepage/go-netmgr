@@ -2,6 +2,7 @@ package netmgr
 
 import (
 	"github.com/godbus/dbus/v5"
+	"github.com/nlepage/go-netmgr/internal/dbusext"
 )
 
 // BusName of NetworkManager.
@@ -54,7 +55,7 @@ type (
 	}
 
 	networkManager struct {
-		busObject
+		dbusext.BusObject
 	}
 )
 
@@ -62,7 +63,7 @@ var _ NetworkManager = (*networkManager)(nil)
 
 // NewNetworkManager returns the Connection Manager from conn.
 func NewNetworkManager(conn *dbus.Conn) NetworkManager {
-	return &networkManager{newBusObject(conn, NetworkManagerPath)}
+	return &networkManager{dbusext.NewBusObject(conn, BusName, NetworkManagerPath)}
 }
 
 // SystemNetworkManager returns the Connection Manager from the system bus.
@@ -82,7 +83,7 @@ func SystemNetworkManager() (NetworkManager, error) {
 }
 
 func (nm *networkManager) Reload(flags uint) error {
-	return nm.callAndStore(NetworkManagerInterface+".Reload", args{flags}, nil)
+	return nm.CallAndStore(NetworkManagerInterface+".Reload", dbusext.Args{flags}, nil)
 }
 
 // Reload NetworkManager's configuration and perform certain updates, like flushing a cache or rewriting external state to disk.
@@ -128,7 +129,7 @@ func GetAllDevices() ([]Device, error) {
 
 func (nm *networkManager) getDevices(method string) ([]Device, error) {
 	var paths []dbus.ObjectPath
-	if err := nm.callAndStore(method, nil, args{&paths}); err != nil {
+	if err := nm.CallAndStore(method, nil, dbusext.Args{&paths}); err != nil {
 		return nil, err
 	}
 
@@ -142,7 +143,7 @@ func (nm *networkManager) getDevices(method string) ([]Device, error) {
 
 func (nm *networkManager) GetDeviceByIPIface(iface string) (Device, error) {
 	var path dbus.ObjectPath
-	if err := nm.callAndStore(NetworkManagerInterface+".GetDeviceByIpIface", args{iface}, args{&path}); err != nil {
+	if err := nm.CallAndStore(NetworkManagerInterface+".GetDeviceByIpIface", dbusext.Args{iface}, dbusext.Args{&path}); err != nil {
 		return nil, err
 	}
 	return nm.device(path), nil
@@ -160,25 +161,25 @@ func GetDeviceByIPIface(iface string) (Device, error) {
 }
 
 func (nm *networkManager) ActivateConnection(connection interface{}, device interface{}, specificObject interface{}) (ConnectionActive, error) {
-	connectionPath, err := objectPath(connection)
+	connectionPath, err := dbusext.ObjectPath(connection)
 	if err != nil {
 		return nil, err
 	}
-	devicePath, err := objectPath(device)
+	devicePath, err := dbusext.ObjectPath(device)
 	if err != nil {
 		return nil, err
 	}
-	specificObjectPath, err := objectPath(specificObject)
+	specificObjectPath, err := dbusext.ObjectPath(specificObject)
 	if err != nil {
 		return nil, err
 	}
 
 	var path dbus.ObjectPath
-	if err := nm.callAndStore(NetworkManagerInterface+".ActivateConnection", args{connectionPath, devicePath, specificObjectPath}, args{&path}); err != nil {
+	if err := nm.CallAndStore(NetworkManagerInterface+".ActivateConnection", dbusext.Args{connectionPath, devicePath, specificObjectPath}, dbusext.Args{&path}); err != nil {
 		return nil, err
 	}
 
-	ca := connectionActive{newBusObject(nm.conn, path)}
+	ca := connectionActive{nm.NewBusObject(BusName, path)}
 
 	isVPN, err := ca.Vpn()
 	if err != nil {
@@ -204,12 +205,12 @@ func ActivateConnection(connection interface{}, device interface{}, specificObje
 }
 
 func (nm *networkManager) DeactivateConnection(activeConnection interface{}) error {
-	activeConnectionPath, err := objectPath(activeConnection)
+	activeConnectionPath, err := dbusext.ObjectPath(activeConnection)
 	if err != nil {
 		return err
 	}
 
-	return nm.callAndStore(NetworkManagerInterface+".DeactivateConnection", args{activeConnectionPath}, nil)
+	return nm.CallAndStore(NetworkManagerInterface+".DeactivateConnection", dbusext.Args{activeConnectionPath}, nil)
 }
 
 // DeactivateConnection deactivates an active connection.
@@ -224,5 +225,5 @@ func DeactivateConnection(activeConnection interface{}) error {
 }
 
 func (nm *networkManager) device(path dbus.ObjectPath) Device {
-	return &device{newBusObject(nm.conn, path)}
+	return &device{nm.NewBusObject(BusName, path)}
 }
