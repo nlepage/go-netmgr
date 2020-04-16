@@ -32,5 +32,5 @@ type (
 var _ ConnectionActive = (*connectionActive)(nil)
 
 func (ca *connectionActive) Vpn() (bool, error) {
-	return ca.GetBoolProperty(ConnectionActiveIface + ".Vpn")
+	return ca.GetBProperty(ConnectionActiveIface + ".Vpn")
 }

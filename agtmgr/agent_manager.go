@@ -20,6 +20,8 @@ const AgentManagerPath = "/org/freedesktop/NetworkManager/AgentManager"
 
 type (
 	// AgentManager is the Secret Agent Manager.
+	//
+	// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.AgentManager.html for more information.
 	AgentManager interface {
 		dbus.BusObject
 

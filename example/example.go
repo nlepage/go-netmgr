@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/nlepage/go-netmgr"
+	"github.com/nlepage/go-netmgr/dnsmgr"
 )
 
 func main() {
@@ -26,14 +27,9 @@ func main() {
 		fmt.Println(iface, driver)
 	}
 
-	if err := netmgr.DeactivateConnection("/org/freedesktop/NetworkManager/ActiveConnection/1"); err != nil {
-		panic(err)
-	}
-
-	ac, err := netmgr.ActivateConnection("/org/freedesktop/NetworkManager/Settings/6", "/org/freedesktop/NetworkManager/Devices/3", nil)
+	config, err := dnsmgr.Configuration()
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(ac.Path())
+	fmt.Printf("%#v", config)
 }

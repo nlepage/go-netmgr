@@ -55,25 +55,25 @@ type (
 var _ Device = (*device)(nil)
 
 func (d *device) Udi() (string, error) {
-	return d.GetStringProperty(DeviceIface + ".Udi")
+	return d.GetSProperty(DeviceIface + ".Udi")
 }
 
 func (d *device) Interface() (string, error) {
-	return d.GetStringProperty(DeviceIface + ".Interface")
+	return d.GetSProperty(DeviceIface + ".Interface")
 }
 
 func (d *device) IPInterface() (string, error) {
-	return d.GetStringProperty(DeviceIface + ".IpInterface")
+	return d.GetSProperty(DeviceIface + ".IpInterface")
 }
 
 func (d *device) Driver() (string, error) {
-	return d.GetStringProperty(DeviceIface + ".Driver")
+	return d.GetSProperty(DeviceIface + ".Driver")
 }
 
 func (d *device) DriverVersion() (string, error) {
-	return d.GetStringProperty(DeviceIface + ".DriverVersion")
+	return d.GetSProperty(DeviceIface + ".DriverVersion")
 }
 
 func (d *device) FirmwareVersion() (string, error) {
-	return d.GetStringProperty(DeviceIface + ".FirmwareVersion")
+	return d.GetSProperty(DeviceIface + ".FirmwareVersion")
 }

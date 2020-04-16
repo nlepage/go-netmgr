@@ -35,18 +35,34 @@ func (o *BusObject) Signal(iface string, member string, out chan<- []interface{}
 	return o.sm.Signal(iface, member, o.Path(), out)
 }
 
-func (o *BusObject) GetStringProperty(name string) (string, error) {
-	v, err := o.GetProperty(name)
+func (o *BusObject) GetSProperty(name string) (string, error) {
+	p, err := o.GetProperty(name)
 	if err != nil {
 		return "", err
 	}
-	return v.Value().(string), nil
+	return p.Value().(string), nil
 }
 
-func (o *BusObject) GetBoolProperty(name string) (bool, error) {
-	v, err := o.GetProperty(name)
+func (o *BusObject) GetBProperty(name string) (bool, error) {
+	p, err := o.GetProperty(name)
 	if err != nil {
 		return false, err
 	}
-	return v.Value().(bool), nil
+	return p.Value().(bool), nil
+}
+
+func (o *BusObject) GetAASVProperty(name string) ([]map[string]interface{}, error) {
+	p, err := o.GetProperty(name)
+	if err != nil {
+		return nil, err
+	}
+	v := p.Value().([]map[string]dbus.Variant)
+	vi := make([]map[string]interface{}, len(v))
+	for i, m := range v {
+		vi[i] = make(map[string]interface{}, len(m))
+		for k, va := range m {
+			vi[i][k] = va.Value()
+		}
+	}
+	return vi, nil
 }
