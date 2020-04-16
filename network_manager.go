@@ -61,25 +61,25 @@ type (
 
 var _ NetworkManager = (*networkManager)(nil)
 
-// NewNetworkManager returns the Connection Manager from conn.
-func NewNetworkManager(conn *dbus.Conn) NetworkManager {
+// New returns the Connection Manager from conn.
+func New(conn *dbus.Conn) NetworkManager {
 	return &networkManager{dbusext.NewBusObject(conn, BusName, NetworkManagerPath)}
 }
 
-// SystemNetworkManager returns the Connection Manager from the system bus.
+// System returns the Connection Manager from the system bus.
 //
-// This is equivalent to:
+// It is equivalent to:
 //  conn, err := dbus.SystemBus()
 //  if err != nil {
 //      return nil, err
 //  }
-//  nm := netmgr.NewNetworkManager(conn)
-func SystemNetworkManager() (NetworkManager, error) {
+//  nm := netmgr.New(conn)
+func System() (NetworkManager, error) {
 	conn, err := dbus.SystemBus()
 	if err != nil {
 		return nil, err
 	}
-	return NewNetworkManager(conn), nil
+	return New(conn), nil
 }
 
 func (nm *networkManager) Reload(flags uint) error {
@@ -90,7 +90,7 @@ func (nm *networkManager) Reload(flags uint) error {
 //
 // See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.Reload for more information.
 func Reload(flags uint) error {
-	nm, err := SystemNetworkManager()
+	nm, err := System()
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func (nm *networkManager) GetDevices() ([]Device, error) {
 //
 // See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.GetDevices for more information.
 func GetDevices() ([]Device, error) {
-	nm, err := SystemNetworkManager()
+	nm, err := System()
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (nm *networkManager) GetAllDevices() ([]Device, error) {
 //
 // See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.GetAllDevices for more information.
 func GetAllDevices() ([]Device, error) {
-	nm, err := SystemNetworkManager()
+	nm, err := System()
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +153,7 @@ func (nm *networkManager) GetDeviceByIPIface(iface string) (Device, error) {
 //
 // See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.GetDeviceByIpIface for more information.
 func GetDeviceByIPIface(iface string) (Device, error) {
-	nm, err := SystemNetworkManager()
+	nm, err := System()
 	if err != nil {
 		return nil, err
 	}
@@ -197,7 +197,7 @@ func (nm *networkManager) ActivateConnection(connection interface{}, device inte
 //
 // See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.ActivateConnection for more information.
 func ActivateConnection(connection interface{}, device interface{}, specificObject interface{}) (ConnectionActive, error) {
-	nm, err := SystemNetworkManager()
+	nm, err := System()
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +217,7 @@ func (nm *networkManager) DeactivateConnection(activeConnection interface{}) err
 //
 // See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.DeactivateConnection for more information.
 func DeactivateConnection(activeConnection interface{}) error {
-	nm, err := SystemNetworkManager()
+	nm, err := System()
 	if err != nil {
 		return err
 	}
