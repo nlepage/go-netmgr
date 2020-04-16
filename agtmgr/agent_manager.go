@@ -26,7 +26,7 @@ type (
 		// RegisterWithCapabilities is like Register() but indicates agent capabilities to NetworkManager.
 		//
 		// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.AgentManager.html#gdbus-method-org-freedesktop-NetworkManager-AgentManager.RegisterWithCapabilities for more information.
-		RegisterWithCapabilities(identifier string, capabilities uint) error
+		RegisterWithCapabilities(identifier string, capabilities Capabilities) error
 
 		// Unregister is called by secret Agents to notify NetworkManager that they will no longer handle requests for network secrets.
 		//
@@ -78,14 +78,14 @@ func Register(identifier string) error {
 	return am.Register(identifier)
 }
 
-func (am *agentManager) RegisterWithCapabilities(identifier string, capabilities uint) error {
+func (am *agentManager) RegisterWithCapabilities(identifier string, capabilities Capabilities) error {
 	return am.CallAndStore(AgentManagerIface+".RegisterWithCapabilities", dbusext.Args{identifier, capabilities}, nil)
 }
 
 // RegisterWithCapabilities is like Register() but indicates agent capabilities to NetworkManager.
 //
 // See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.AgentManager.html#gdbus-method-org-freedesktop-NetworkManager-AgentManager.RegisterWithCapabilities for more information.
-func RegisterWithCapabilities(identifier string, capabilities uint) error {
+func RegisterWithCapabilities(identifier string, capabilities Capabilities) error {
 	am, err := System()
 	if err != nil {
 		return err
@@ -107,3 +107,16 @@ func Unregister() error {
 	}
 	return am.Unregister()
 }
+
+// Capabilities indicate various capabilities of the agent.
+//
+// See https://developer.gnome.org/NetworkManager/stable/nm-dbus-types.html#NMSecretAgentCapabilities for more information.
+type Capabilities uint
+
+const (
+	// CapabilityNone indicates the agent supports no special capabilities.
+	CapabilityNone Capabilities = iota
+
+	// CapabilityVpnHints indicates the agent supports passing hints to VPN plugin authentication dialogs.
+	CapabilityVpnHints
+)
