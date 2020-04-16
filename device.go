@@ -54,6 +54,12 @@ type (
 
 var _ Device = (*device)(nil)
 
+func NewDevice(conn *dbus.Conn, path dbus.ObjectPath) Device {
+	// FIXME compose using device type
+
+	return &device{dbusext.NewBusObject(conn, BusName, path)}
+}
+
 func (d *device) Udi() (string, error) {
 	return d.GetSProperty(DeviceIface + ".Udi")
 }
@@ -77,3 +83,27 @@ func (d *device) DriverVersion() (string, error) {
 func (d *device) FirmwareVersion() (string, error) {
 	return d.GetSProperty(DeviceIface + ".FirmwareVersion")
 }
+
+// Metered has two different purposes:
+// one is to configure "connection.metered" setting of a connection profile in NMSettingConnection,
+// and the other is to express the actual metered state of the NMDevice at a given moment.
+//
+// See https://developer.gnome.org/NetworkManager/stable/nm-dbus-types.html#NMMetered for more information.
+type Metered uint
+
+const (
+	// MeteredUnknown is unknown.
+	MeteredUnknown Metered = iota
+
+	// MeteredYes is metered, the value was explicitly configured.
+	MeteredYes
+
+	// MeteredNo is not metered, the value was explicitly configured.
+	MeteredNo
+
+	// MeteredGuessYes is metered, the value was guessed.
+	MeteredGuessYes
+
+	// MeteredGuessNo is not metered, the value was guessed.
+	MeteredGuessNo
+)

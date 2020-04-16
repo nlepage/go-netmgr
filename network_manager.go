@@ -29,6 +29,37 @@ type (
 		GetDeviceByIPIface(iface string) (Device, error)
 		ActivateConnection(connection interface{}, device interface{}, specificObject interface{}) (ConnectionActive, error)
 		DeactivateConnection(activeConnection interface{}) error
+
+		// Properties
+		Devices() ([]Device, error)
+		AllDevices() ([]Device, error)
+		CheckPoints() ([]Checkpoint, error)
+		NetworkingEnabled() (bool, error)
+		WirelessEnabled() (bool, error)
+		SetWirelessEnabled(bool) error
+		WirelessHardwareEnabled() (bool, error)
+		WwanEnabled() (bool, error)
+		SetWwanEnabled(bool) error
+		WwanHardwareEnabled() (bool, error)
+		WimaxEnabled() (bool, error)
+		SetWimaxEnabled(bool) error
+		WimaxHardwareEnabled() (bool, error)
+		ActiveConnections() ([]ConnectionActive, error)
+		PrimaryConnection() (ConnectionActive, error)
+		PrimaryConnectionType() (string, error)
+		Metered() (Metered, error)
+		ActivatingConnection() (ConnectionActive, error)
+		Startup() (bool, error)
+		Version() (string, error)
+		Capabilities() ([]Capability, error)
+		State() (State, error)
+		Connectivity() (ConnectivityState, error)
+		ConnectivityCheckAvailable() (bool, error)
+		ConnectivityCheckEnabled() (bool, error)
+		SetConnectivityCheckEnabled(bool) error
+		ConnectivityCheckUri() (string, error)
+		GlobalDnsConfiguration() (map[string]interface{}, error)
+		SetGlobalDnsConfiguration(map[string]interface{}) error
 	}
 
 	networkManager struct {
@@ -105,14 +136,14 @@ func GetAllDevices() ([]Device, error) {
 }
 
 func (nm *networkManager) getDevices(method string) ([]Device, error) {
-	var paths []dbus.ObjectPath
-	if err := nm.CallAndStore(method, nil, dbusext.Args{&paths}); err != nil {
+	var devicesPaths []dbus.ObjectPath
+	if err := nm.CallAndStore(method, nil, dbusext.Args{&devicesPaths}); err != nil {
 		return nil, err
 	}
 
-	devices := make([]Device, 0, len(paths))
-	for _, path := range paths {
-		devices = append(devices, nm.device(path))
+	devices := make([]Device, 0, len(devicesPaths))
+	for _, path := range devicesPaths {
+		devices = append(devices, NewDevice(nm.Conn, path))
 	}
 
 	return devices, nil
@@ -123,7 +154,7 @@ func (nm *networkManager) GetDeviceByIPIface(iface string) (Device, error) {
 	if err := nm.CallAndStore(NetworkManagerInterface+".GetDeviceByIpIface", dbusext.Args{iface}, dbusext.Args{&path}); err != nil {
 		return nil, err
 	}
-	return nm.device(path), nil
+	return NewDevice(nm.Conn, path), nil
 }
 
 // GetDeviceByIPIface returns the object path of the network device referenced by its IP interface name.
@@ -151,23 +182,12 @@ func (nm *networkManager) ActivateConnection(connection interface{}, device inte
 		return nil, err
 	}
 
-	var path dbus.ObjectPath
-	if err := nm.CallAndStore(NetworkManagerInterface+".ActivateConnection", dbusext.Args{connectionPath, devicePath, specificObjectPath}, dbusext.Args{&path}); err != nil {
+	var connectionActivePath dbus.ObjectPath
+	if err := nm.CallAndStore(NetworkManagerInterface+".ActivateConnection", dbusext.Args{connectionPath, devicePath, specificObjectPath}, dbusext.Args{&connectionActivePath}); err != nil {
 		return nil, err
 	}
 
-	ca := connectionActive{nm.NewBusObject(BusName, path)}
-
-	isVPN, err := ca.Vpn()
-	if err != nil {
-		return nil, err
-	}
-
-	if isVPN {
-		return &vpnConnection{ca}, nil
-	}
-
-	return &ca, nil
+	return NewConnectionActive(nm.Conn, connectionActivePath)
 }
 
 // ActivateConnection activates a connection using the supplied device.
@@ -201,6 +221,27 @@ func DeactivateConnection(activeConnection interface{}) error {
 	return nm.DeactivateConnection(activeConnection)
 }
 
-func (nm *networkManager) device(path dbus.ObjectPath) Device {
-	return &device{nm.NewBusObject(BusName, path)}
-}
+// Capability names the numbers in the Capabilities property.
+//
+// See https://developer.gnome.org/NetworkManager/stable/nm-dbus-types.html#NMCapability for more information.
+type Capability uint
+
+const (
+	// CapabilityTeam indicates teams can be managed. This means the team device plugin is loaded.
+	CapabilityTeam Capability = iota + 1
+
+	// CapabilityOVS indicates OpenVSwitch can be managed. This means the OVS device plugin is loaded. Since: 1.24, 1.22.2
+	CapabilityOVS
+)
+
+// State values indicate the current overall networking state.
+//
+// See https://developer.gnome.org/NetworkManager/stable/nm-dbus-types.html#NMState for more information.
+type State uint
+
+// FIXME State consts
+
+// ConnectivityState values indicate the connectivity state.
+type ConnectivityState uint
+
+// FIXME ConnectivityState consts

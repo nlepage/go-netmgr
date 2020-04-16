@@ -7,7 +7,7 @@ import (
 type (
 	BusObject struct {
 		dbus.BusObject
-		conn *dbus.Conn
+		Conn *dbus.Conn
 		sm   *signalManager
 	}
 
@@ -16,10 +16,6 @@ type (
 
 func NewBusObject(conn *dbus.Conn, busName string, path dbus.ObjectPath) BusObject {
 	return BusObject{conn.Object(busName, path), conn, newSignalManager(conn)}
-}
-
-func (o *BusObject) NewBusObject(busName string, path dbus.ObjectPath) BusObject {
-	return NewBusObject(o.conn, busName, path)
 }
 
 func (o *BusObject) CallAndStore(method string, in Args, out Args) error {

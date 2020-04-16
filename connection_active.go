@@ -31,6 +31,21 @@ type (
 
 var _ ConnectionActive = (*connectionActive)(nil)
 
+func NewConnectionActive(conn *dbus.Conn, path dbus.ObjectPath) (ConnectionActive, error) {
+	ca := connectionActive{dbusext.NewBusObject(conn, BusName, path)}
+
+	isVPN, err := ca.Vpn()
+	if err != nil {
+		return nil, err
+	}
+
+	if isVPN {
+		return &vpnConnection{ca}, nil
+	}
+
+	return &ca, nil
+}
+
 func (ca *connectionActive) Vpn() (bool, error) {
 	return ca.GetBProperty(ConnectionActiveIface + ".Vpn")
 }
