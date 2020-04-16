@@ -15,7 +15,7 @@ type (
 )
 
 func newBusObject(conn *dbus.Conn, path dbus.ObjectPath) busObject {
-	return busObject{conn.Object(Destination, path), conn, newSignalManager(conn)}
+	return busObject{conn.Object(BusName, path), conn, newSignalManager(conn)}
 }
 
 func (o *busObject) callAndStore(method string, in args, out args) error {

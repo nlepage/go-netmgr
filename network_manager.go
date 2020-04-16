@@ -4,8 +4,8 @@ import (
 	"github.com/godbus/dbus/v5"
 )
 
-// Destination of NetworkManager D-Bus API.
-const Destination = "org.freedesktop.NetworkManager"
+// BusName of NetworkManager.
+const BusName = "org.freedesktop.NetworkManager"
 
 // NetworkManagerPath is the Connection Manager path.
 const NetworkManagerPath = "/org/freedesktop/NetworkManager"
