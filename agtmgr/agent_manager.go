@@ -2,6 +2,8 @@
 package agtmgr
 
 import (
+	"strconv"
+
 	"github.com/godbus/dbus/v5"
 
 	"github.com/nlepage/go-netmgr/internal/dbusext"
@@ -114,3 +116,13 @@ const (
 	// CapabilityVpnHints indicates the agent supports passing hints to VPN plugin authentication dialogs.
 	CapabilityVpnHints
 )
+
+func (c Capabilities) String() string {
+	switch c {
+	case CapabilityNone:
+		return "NM_SECRET_AGENT_CAPABILITY_NONE"
+	case CapabilityVpnHints:
+		return "NM_SECRET_AGENT_CAPABILITY_VPN_HINTS"
+	}
+	return strconv.Itoa(int(c))
+}
