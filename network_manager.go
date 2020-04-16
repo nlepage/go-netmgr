@@ -23,34 +23,11 @@ type (
 
 		// Methods
 
-		// Reload NetworkManager's configuration and perform certain updates, like flushing a cache or rewriting external state to disk.
-		//
-		// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.Reload for more information.
 		Reload(flags uint) error
-
-		// GetDevices gets the list of realized network devices.
-		//
-		// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.GetDevices for more information.
 		GetDevices() ([]Device, error)
-
-		// GetAllDevices gets the list of all network devices.
-		//
-		// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.GetAllDevices for more information.
 		GetAllDevices() ([]Device, error)
-
-		// GetDeviceByIPIface returns the object path of the network device referenced by its IP interface name.
-		//
-		// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.GetDeviceByIpIface for more information.
 		GetDeviceByIPIface(iface string) (Device, error)
-
-		// ActivateConnection activates a connection using the supplied device.
-		//
-		// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.ActivateConnection for more information.
 		ActivateConnection(connection interface{}, device interface{}, specificObject interface{}) (ConnectionActive, error)
-
-		// DeactivateConnection deactivates an active connection.
-		//
-		// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.DeactivateConnection for more information.
 		DeactivateConnection(activeConnection interface{}) error
 	}
 

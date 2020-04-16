@@ -1,11 +1,14 @@
+// Package agtmgr offers bindings for the AgentManager of NetworkManager D-Bus API (https://developer.gnome.org/NetworkManager/stable/spec.html).
 package agtmgr
 
 import (
 	"github.com/godbus/dbus/v5"
 
-	"github.com/nlepage/go-netmgr"
 	"github.com/nlepage/go-netmgr/internal/dbusext"
 )
+
+// BusName of NetworkManager.
+const BusName = "org.freedesktop.NetworkManager"
 
 // AgentManagerIface is the AgentManager interface.
 const AgentManagerIface = "org.freedesktop.NetworkManager.AgentManager"
@@ -18,19 +21,10 @@ type (
 	AgentManager interface {
 		dbus.BusObject
 
-		// Register is called by secret Agents to register their ability to provide and save network secrets.
-		//
-		// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.AgentManager.html#gdbus-method-org-freedesktop-NetworkManager-AgentManager.Register for more information.
+		// Methods
+
 		Register(identifier string) error
-
-		// RegisterWithCapabilities is like Register() but indicates agent capabilities to NetworkManager.
-		//
-		// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.AgentManager.html#gdbus-method-org-freedesktop-NetworkManager-AgentManager.RegisterWithCapabilities for more information.
 		RegisterWithCapabilities(identifier string, capabilities Capabilities) error
-
-		// Unregister is called by secret Agents to notify NetworkManager that they will no longer handle requests for network secrets.
-		//
-		// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.AgentManager.html#gdbus-method-org-freedesktop-NetworkManager-AgentManager.Unregister for more information.
 		Unregister() error
 	}
 
@@ -43,7 +37,7 @@ var _ AgentManager = (*agentManager)(nil)
 
 // New returns the Agent Manager from conn.
 func New(conn *dbus.Conn) AgentManager {
-	return &agentManager{dbusext.NewBusObject(conn, netmgr.BusName, AgentManagerPath)}
+	return &agentManager{dbusext.NewBusObject(conn, BusName, AgentManagerPath)}
 }
 
 // System returns the Agent Manager from the system bus.
