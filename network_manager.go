@@ -657,9 +657,50 @@ const (
 // See https://developer.gnome.org/NetworkManager/stable/nm-dbus-types.html#NMState for more information.
 type StateEnum uint
 
-// FIXME State consts
+const (
+	// StateUnknown means networking state is unknown.
+	StateUnknown StateEnum = iota * 10
+
+	// StateAsleep means networking is not enabled, the system is being suspended or resumed from suspend.
+	StateAsleep
+
+	// StateDisconnected means there is no active network connection.
+	StateDisconnected
+
+	// StateDisconnecting means network connections are being cleaned up.
+	StateDisconnecting
+
+	// StateConnecting means a network connection is being started.
+	StateConnecting
+
+	// StateConnectedLocal means there is only local IPv4 and/or IPv6 connectivity, but no default route to access the Internet.
+	StateConnectedLocal
+
+	// StateConnectedSite means there is only site-wide IPv4 and/or IPv6 connectivity.
+	StateConnectedSite
+
+	// StateConnectedGlobal means there is global IPv4 and/or IPv6 Internet connectivity.
+	StateConnectedGlobal
+)
 
 // ConnectivityState values indicate the connectivity state.
+//
+// See https://developer.gnome.org/NetworkManager/stable/nm-dbus-types.html#NMConnectivityState for more information.
 type ConnectivityState uint
 
-// FIXME ConnectivityState consts
+const (
+	// ConnectivityUnknown means network connectivity is unknown.
+	ConnectivityUnknown ConnectivityState = iota
+
+	// ConnectivityNone means the host is not connected to any network.
+	ConnectivityNone
+
+	// ConnectivityPortal means the Internet connection is hijacked by a captive portal gateway.
+	ConnectivityPortal
+
+	// ConnectivityLimited means the host is connected to a network, does not appear to be able to reach the full Internet, but a captive portal has not been detected.
+	ConnectivityLimited
+
+	// ConnectivityFull means the host is connected to a network, and appears to be able to reach the full Internet.
+	ConnectivityFull
+)
