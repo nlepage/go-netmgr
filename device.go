@@ -92,7 +92,7 @@ func (d *device) FirmwareVersion() (string, error) {
 	return d.GetSProperty(DeviceIface + ".FirmwareVersion")
 }
 
-// Metered has two different purposes:
+// MeteredEnum has two different purposes:
 // one is to configure "connection.metered" setting of a connection profile in NMSettingConnection,
 // and the other is to express the actual metered state of the NMDevice at a given moment.
 //
