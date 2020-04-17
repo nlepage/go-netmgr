@@ -23,10 +23,12 @@ type (
 
 var _ Checkpoint = (*checkpoint)(nil)
 
+// NewCheckpoint returns the Checkpoint from conn corresponding to path.
 func NewCheckpoint(conn *dbus.Conn, path dbus.ObjectPath) Checkpoint {
 	return &checkpoint{dbusext.NewBusObject(conn, BusName, path)}
 }
 
+// NewCheckpoints returns the slice of Checkpoint from conn corresponding to paths.
 func NewCheckpoints(conn *dbus.Conn, paths []dbus.ObjectPath) []Checkpoint {
 	checkpoints := make([]Checkpoint, len(paths))
 	for i, path := range paths {

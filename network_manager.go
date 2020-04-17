@@ -2,6 +2,7 @@ package netmgr
 
 import (
 	"github.com/godbus/dbus/v5"
+
 	"github.com/nlepage/go-netmgr/internal/dbusext"
 )
 
@@ -31,6 +32,7 @@ type (
 		DeactivateConnection(activeConnection interface{}) error
 
 		// Properties
+
 		Devices() ([]Device, error)
 		AllDevices() ([]Device, error)
 		Checkpoints() ([]Checkpoint, error)

@@ -31,6 +31,7 @@ type (
 
 var _ ConnectionActive = (*connectionActive)(nil)
 
+// NewConnectionActive returns the ConnectionActive from conn corresponding to path.
 func NewConnectionActive(conn *dbus.Conn, path dbus.ObjectPath) (ConnectionActive, error) {
 	ca := connectionActive{dbusext.NewBusObject(conn, BusName, path)}
 
@@ -46,6 +47,7 @@ func NewConnectionActive(conn *dbus.Conn, path dbus.ObjectPath) (ConnectionActiv
 	return &ca, nil
 }
 
+// NewConnectionActive returns the slice of ConnectionActive from conn corresponding to paths.
 func NewConnectionActives(conn *dbus.Conn, paths []dbus.ObjectPath) ([]ConnectionActive, error) {
 	connectionActives := make([]ConnectionActive, len(paths))
 	var err error

@@ -54,12 +54,14 @@ type (
 
 var _ Device = (*device)(nil)
 
+// NewDevice returns the Device from conn corresponding to path.
 func NewDevice(conn *dbus.Conn, path dbus.ObjectPath) Device {
 	// FIXME compose using device type
 
 	return &device{dbusext.NewBusObject(conn, BusName, path)}
 }
 
+// NewDevices returns the slice of Device from conn corresponding paths.
 func NewDevices(conn *dbus.Conn, paths []dbus.ObjectPath) []Device {
 	devices := make([]Device, len(paths))
 	for i, path := range paths {
