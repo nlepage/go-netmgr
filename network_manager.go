@@ -33,7 +33,7 @@ type (
 		// Properties
 		Devices() ([]Device, error)
 		AllDevices() ([]Device, error)
-		CheckPoints() ([]Checkpoint, error)
+		Checkpoints() ([]Checkpoint, error)
 		NetworkingEnabled() (bool, error)
 		WirelessEnabled() (bool, error)
 		SetWirelessEnabled(bool) error
@@ -47,17 +47,17 @@ type (
 		ActiveConnections() ([]ConnectionActive, error)
 		PrimaryConnection() (ConnectionActive, error)
 		PrimaryConnectionType() (string, error)
-		Metered() (Metered, error)
+		Metered() (MeteredEnum, error)
 		ActivatingConnection() (ConnectionActive, error)
 		Startup() (bool, error)
 		Version() (string, error)
 		Capabilities() ([]Capability, error)
-		State() (State, error)
+		State() (StateEnum, error)
 		Connectivity() (ConnectivityState, error)
 		ConnectivityCheckAvailable() (bool, error)
 		ConnectivityCheckEnabled() (bool, error)
 		SetConnectivityCheckEnabled(bool) error
-		ConnectivityCheckUri() (string, error)
+		ConnectivityCheckURI() (string, error)
 		GlobalDnsConfiguration() (map[string]interface{}, error)
 		SetGlobalDnsConfiguration(map[string]interface{}) error
 	}
@@ -215,12 +215,20 @@ func DeactivateConnection(activeConnection interface{}) error {
 	return nm.DeactivateConnection(activeConnection)
 }
 
+func (nm *networkManager) Devices() ([]Device, error) {
+	return nm.devices("Devices")
+}
+
 func Devices() ([]Device, error) {
 	nm, err := System()
 	if err != nil {
 		return nil, err
 	}
 	return nm.Devices()
+}
+
+func (nm *networkManager) AllDevices() ([]Device, error) {
+	return nm.devices("AllDevices")
 }
 
 func AllDevices() ([]Device, error) {
@@ -247,44 +255,132 @@ func (nm *networkManager) Checkpoints() ([]Checkpoint, error) {
 	return NewCheckpoints(nm.Conn, paths), nil
 }
 
+func Checkpoints() ([]Checkpoint, error) {
+	nm, err := System()
+	if err != nil {
+		return nil, err
+	}
+	return nm.Checkpoints()
+}
+
 func (nm *networkManager) NetworkingEnabled() (bool, error) {
 	return nm.GetBProperty(NetworkManagerInterface + ".NetworkingEnabled")
+}
+
+func NetworkingEnabled() (bool, error) {
+	nm, err := System()
+	if err != nil {
+		return false, err
+	}
+	return nm.NetworkingEnabled()
 }
 
 func (nm *networkManager) WirelessEnabled() (bool, error) {
 	return nm.GetBProperty(NetworkManagerInterface + ".WirelessEnabled")
 }
 
+func WirelessEnabled() (bool, error) {
+	nm, err := System()
+	if err != nil {
+		return false, err
+	}
+	return nm.WirelessEnabled()
+}
+
 func (nm *networkManager) SetWirelessEnabled(value bool) error {
 	return nm.SetProperty(NetworkManagerInterface+".WirelessEnabled", value)
+}
+
+func SetWirelessEnabled(value bool) error {
+	nm, err := System()
+	if err != nil {
+		return err
+	}
+	return nm.SetWirelessEnabled(value)
 }
 
 func (nm *networkManager) WirelessHardwareEnabled() (bool, error) {
 	return nm.GetBProperty(NetworkManagerInterface + ".WirelessHardwareEnabled")
 }
 
+func WirelessHardwareEnabled() (bool, error) {
+	nm, err := System()
+	if err != nil {
+		return false, err
+	}
+	return nm.WirelessHardwareEnabled()
+}
+
 func (nm *networkManager) WwanEnabled() (bool, error) {
 	return nm.GetBProperty(NetworkManagerInterface + ".WwanEnabled")
+}
+
+func WwanEnabled() (bool, error) {
+	nm, err := System()
+	if err != nil {
+		return false, err
+	}
+	return nm.WwanEnabled()
 }
 
 func (nm *networkManager) SetWwanEnabled(value bool) error {
 	return nm.SetProperty(NetworkManagerInterface+".WwanEnabled", value)
 }
 
+func SetWwanEnabled(value bool) error {
+	nm, err := System()
+	if err != nil {
+		return err
+	}
+	return nm.SetWwanEnabled(value)
+}
+
 func (nm *networkManager) WwanHardwareEnabled() (bool, error) {
 	return nm.GetBProperty(NetworkManagerInterface + ".WwanHardwareEnabled")
+}
+
+func WwanHardwareEnabled() (bool, error) {
+	nm, err := System()
+	if err != nil {
+		return false, err
+	}
+	return nm.WwanHardwareEnabled()
 }
 
 func (nm *networkManager) WimaxEnabled() (bool, error) {
 	return nm.GetBProperty(NetworkManagerInterface + ".WimaxEnabled")
 }
 
+func WimaxEnabled() (bool, error) {
+	nm, err := System()
+	if err != nil {
+		return false, err
+	}
+	return nm.WimaxEnabled()
+}
+
 func (nm *networkManager) SetWimaxEnabled(value bool) error {
 	return nm.SetProperty(NetworkManagerInterface+".WimaxEnabled", value)
 }
 
+func SetWimaxEnabled(value bool) error {
+	nm, err := System()
+	if err != nil {
+		return err
+	}
+	return nm.SetWimaxEnabled(value)
+}
+
 func (nm *networkManager) WimaxHardwareEnabled() (bool, error) {
 	return nm.GetBProperty(NetworkManagerInterface + ".WimaxHardwareEnabled")
+}
+
+func WimaxHardwareEnabled() (bool, error) {
+	nm, err := System()
+	if err != nil {
+		return false, err
+	}
+	return nm.WimaxHardwareEnabled()
 }
 
 func (nm *networkManager) ActiveConnections() ([]ConnectionActive, error) {
@@ -295,6 +391,14 @@ func (nm *networkManager) ActiveConnections() ([]ConnectionActive, error) {
 	return NewConnectionActives(nm.Conn, paths)
 }
 
+func ActiveConnections() ([]ConnectionActive, error) {
+	nm, err := System()
+	if err != nil {
+		return nil, err
+	}
+	return nm.ActiveConnections()
+}
+
 func (nm *networkManager) PrimaryConnection() (ConnectionActive, error) {
 	path, err := nm.GetOProperty(NetworkManagerInterface + ".PrimaryConnection")
 	if err != nil {
@@ -303,12 +407,37 @@ func (nm *networkManager) PrimaryConnection() (ConnectionActive, error) {
 	return NewConnectionActive(nm.Conn, path)
 }
 
+func PrimaryConnection() (ConnectionActive, error) {
+	nm, err := System()
+	if err != nil {
+		return nil, err
+	}
+	return nm.PrimaryConnection()
+}
+
 func (nm *networkManager) PrimaryConnectionType() (string, error) {
 	return nm.GetSProperty(NetworkManagerInterface + ".PrimaryConnectionType")
 }
 
-func (nm *networkManager) Metered() (Metered, error) {
+func PrimaryConnectionType() (string, error) {
+	nm, err := System()
+	if err != nil {
+		return "", err
+	}
+	return nm.PrimaryConnectionType()
+}
 
+func (nm *networkManager) Metered() (MeteredEnum, error) {
+	metered, err := nm.GetUProperty(NetworkManagerInterface + ".Metered")
+	return MeteredEnum(metered), err
+}
+
+func Metered() (MeteredEnum, error) {
+	nm, err := System()
+	if err != nil {
+		return MeteredEnum(0), err
+	}
+	return nm.Metered()
 }
 
 func (nm *networkManager) ActivatingConnection() (ConnectionActive, error) {
@@ -319,48 +448,154 @@ func (nm *networkManager) ActivatingConnection() (ConnectionActive, error) {
 	return NewConnectionActive(nm.Conn, path)
 }
 
+func ActivatingConnection() (ConnectionActive, error) {
+	nm, err := System()
+	if err != nil {
+		return nil, err
+	}
+	return nm.ActivatingConnection()
+}
+
 func (nm *networkManager) Startup() (bool, error) {
 	return nm.GetBProperty(NetworkManagerInterface + ".Startup")
+}
+
+func Startup() (bool, error) {
+	nm, err := System()
+	if err != nil {
+		return false, err
+	}
+	return nm.Startup()
 }
 
 func (nm *networkManager) Version() (string, error) {
 	return nm.GetSProperty(NetworkManagerInterface + ".Version")
 }
 
-func (nm *networkManager) Capabilities() ([]Capability, error) {
-
+func Version() (string, error) {
+	nm, err := System()
+	if err != nil {
+		return "", err
+	}
+	return nm.Version()
 }
 
-func (nm *networkManager) State() (State, error) {
+func (nm *networkManager) Capabilities() ([]Capability, error) {
+	us, err := nm.GetAUProperty(NetworkManagerInterface + ".Capabilities")
+	if err != nil {
+		return nil, err
+	}
+	capabilities := make([]Capability, len(us))
+	for i, u := range us {
+		capabilities[i] = Capability(u)
+	}
+	return capabilities, err
+}
 
+func Capabilities() ([]Capability, error) {
+	nm, err := System()
+	if err != nil {
+		return nil, err
+	}
+	return nm.Capabilities()
+}
+
+func (nm *networkManager) State() (StateEnum, error) {
+	state, err := nm.GetUProperty(NetworkManagerInterface + ".State")
+	return StateEnum(state), err
+}
+
+func State() (StateEnum, error) {
+	nm, err := System()
+	if err != nil {
+		return StateEnum(0), err
+	}
+	return nm.State()
 }
 
 func (nm *networkManager) Connectivity() (ConnectivityState, error) {
+	connectivity, err := nm.GetUProperty(NetworkManagerInterface + ".Connectivity")
+	return ConnectivityState(connectivity), err
+}
 
+func Connectivity() (ConnectivityState, error) {
+	nm, err := System()
+	if err != nil {
+		return ConnectivityState(0), err
+	}
+	return nm.Connectivity()
 }
 
 func (nm *networkManager) ConnectivityCheckAvailable() (bool, error) {
 	return nm.GetBProperty(NetworkManagerInterface + ".ConnectivityCheckAvailable")
 }
 
+func ConnectivityCheckAvailable() (bool, error) {
+	nm, err := System()
+	if err != nil {
+		return false, err
+	}
+	return nm.ConnectivityCheckAvailable()
+}
+
 func (nm *networkManager) ConnectivityCheckEnabled() (bool, error) {
 	return nm.GetBProperty(NetworkManagerInterface + ".ConnectivityCheckEnabled")
+}
+
+func ConnectivityCheckEnabled() (bool, error) {
+	nm, err := System()
+	if err != nil {
+		return false, err
+	}
+	return nm.ConnectivityCheckEnabled()
 }
 
 func (nm *networkManager) SetConnectivityCheckEnabled(value bool) error {
 	return nm.SetProperty(NetworkManagerInterface+".ConnectivityCheckEnabled", value)
 }
 
+func SetConnectivityCheckEnabled(value bool) error {
+	nm, err := System()
+	if err != nil {
+		return err
+	}
+	return nm.SetConnectivityCheckEnabled(value)
+}
+
 func (nm *networkManager) ConnectivityCheckURI() (string, error) {
 	return nm.GetSProperty(NetworkManagerInterface + ".ConnectivityCheckUri")
 }
 
-func (nm *networkManager) GlobalDnsConfiguration() (map[string]interface{}, error) {
-
+func ConnectivityCheckURI() (string, error) {
+	nm, err := System()
+	if err != nil {
+		return "", err
+	}
+	return nm.ConnectivityCheckURI()
 }
 
-func (nm *networkManager) SetGlobalDnsConfiguration(map[string]interface{}) error {
+func (nm *networkManager) GlobalDnsConfiguration() (map[string]interface{}, error) {
+	return nil, nil
+}
 
+func GlobalDnsConfiguration() (map[string]interface{}, error) {
+	nm, err := System()
+	if err != nil {
+		return nil, err
+	}
+	return nm.GlobalDnsConfiguration()
+}
+
+func (nm *networkManager) SetGlobalDnsConfiguration(value map[string]interface{}) error {
+	return nil
+}
+
+func SetGlobalDnsConfiguration(value map[string]interface{}) error {
+	nm, err := System()
+	if err != nil {
+		return err
+	}
+	return nm.SetGlobalDnsConfiguration(value)
 }
 
 // Capability names the numbers in the Capabilities property.
@@ -379,7 +614,7 @@ const (
 // State values indicate the current overall networking state.
 //
 // See https://developer.gnome.org/NetworkManager/stable/nm-dbus-types.html#NMState for more information.
-type State uint
+type StateEnum uint
 
 // FIXME State consts
 

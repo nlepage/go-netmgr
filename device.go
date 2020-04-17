@@ -97,11 +97,11 @@ func (d *device) FirmwareVersion() (string, error) {
 // and the other is to express the actual metered state of the NMDevice at a given moment.
 //
 // See https://developer.gnome.org/NetworkManager/stable/nm-dbus-types.html#NMMetered for more information.
-type Metered uint
+type MeteredEnum uint
 
 const (
 	// MeteredUnknown is unknown.
-	MeteredUnknown Metered = iota
+	MeteredUnknown MeteredEnum = iota
 
 	// MeteredYes is metered, the value was explicitly configured.
 	MeteredYes
