@@ -29,7 +29,20 @@ type (
 		GetAllDevices() ([]Device, error)
 		GetDeviceByIPIface(iface string) (Device, error)
 		ActivateConnection(connection interface{}, device interface{}, specificObject interface{}) (ConnectionActive, error)
+		AddAndActivateConnection(connection SettingsConnectionInput, device interface{}, specificObject interface{}) (SettingsConnection, ConnectionActive, error)
+		AddAndActivateConnection2(connection SettingsConnectionInput, device interface{}, specificObject interface{}, options map[string]interface{}) (SettingsConnection, ConnectionActive, error)
 		DeactivateConnection(activeConnection interface{}) error
+		Sleep(sleep bool) error
+		Enable(enable bool) error
+		GetPermissions() (map[string]string, error)
+		SetLogging(level string, domains string) error
+		GetLogging() (string, string, error)
+		CheckConnectivity() (ConnectivityState, error)
+		GetState() (StateEnum, error)
+		CheckpointCreate(devices []Device, rollbackTimeout uint, flags CheckpointCreateFlags) (Checkpoint, error)
+		CheckpointDestroy(checkpoint Checkpoint) error
+		CheckpointRollback(checkpoint Checkpoint) (map[dbus.ObjectPath]RollbackResult, error)
+		CheckpointAdjustRollbackTimeout(checkpoint Checkpoint, rollbackTimeout uint) error
 
 		// Properties
 
@@ -704,3 +717,7 @@ const (
 	// ConnectivityFull means the host is connected to a network, and appears to be able to reach the full Internet.
 	ConnectivityFull
 )
+
+type CheckpointCreateFlags uint
+
+type RollbackResult uint
