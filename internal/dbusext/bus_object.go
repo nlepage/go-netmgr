@@ -52,15 +52,21 @@ func (o *BusObject) GetAASVProperty(name string) ([]map[string]interface{}, erro
 	if err != nil {
 		return nil, err
 	}
-	v := p.Value().([]map[string]dbus.Variant)
-	vi := make([]map[string]interface{}, len(v))
-	for i, m := range v {
-		vi[i] = make(map[string]interface{}, len(m))
-		for k, va := range m {
-			vi[i][k] = va.Value()
-		}
+	aasv := p.Value().([]map[string]dbus.Variant)
+	aasi := make([]map[string]interface{}, len(aasv))
+	for i, asv := range aasv {
+		aasi[i] = ASV2ASI(asv)
 	}
-	return vi, nil
+	return aasi, nil
+}
+
+func (o *BusObject) GetASVProperty(name string) (map[string]interface{}, error) {
+	p, err := o.GetProperty(name)
+	if err != nil {
+		return nil, err
+	}
+	asv := p.Value().(map[string]dbus.Variant)
+	return ASV2ASI(asv), nil
 }
 
 func (o *BusObject) GetOProperty(name string) (dbus.ObjectPath, error) {
@@ -93,4 +99,12 @@ func (o *BusObject) GetAUProperty(name string) ([]uint, error) {
 		return nil, err
 	}
 	return p.Value().([]uint), nil
+}
+
+func ASV2ASI(asv map[string]dbus.Variant) map[string]interface{} {
+	asi := make(map[string]interface{}, len(asv))
+	for s, v := range asv {
+		asi[s] = v.Value()
+	}
+	return asi
 }

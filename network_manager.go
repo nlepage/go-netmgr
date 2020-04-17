@@ -610,7 +610,7 @@ func ConnectivityCheckURI() (string, error) {
 }
 
 func (nm *networkManager) GlobalDNSConfiguration() (map[string]interface{}, error) {
-	return nil, nil
+	return nm.GetASVProperty(NetworkManagerInterface + ".GlobalDnsConfiguration")
 }
 
 // GlobalDNSConfiguration is the dictionary of global DNS settings where the key is one of "searches", "options" and "domains".
@@ -625,7 +625,7 @@ func GlobalDNSConfiguration() (map[string]interface{}, error) {
 }
 
 func (nm *networkManager) SetGlobalDNSConfiguration(value map[string]interface{}) error {
-	return nil
+	return nm.SetProperty(NetworkManagerInterface+".GlobalDnsConfiguration", value)
 }
 
 // SetGlobalDNSConfiguration sets the dictionary of global DNS settings where the key is one of "searches", "options" and "domains".
