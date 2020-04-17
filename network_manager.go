@@ -35,14 +35,14 @@ type (
 		Sleep(sleep bool) error
 		Enable(enable bool) error
 		GetPermissions() (map[string]string, error)
-		SetLogging(level string, domains string) error
-		GetLogging() (string, string, error)
-		CheckConnectivity() (ConnectivityState, error)
-		GetState() (StateEnum, error)
-		CheckpointCreate(devices []Device, rollbackTimeout uint, flags CheckpointCreateFlags) (Checkpoint, error)
-		CheckpointDestroy(checkpoint Checkpoint) error
-		CheckpointRollback(checkpoint Checkpoint) (map[dbus.ObjectPath]RollbackResult, error)
-		CheckpointAdjustRollbackTimeout(checkpoint Checkpoint, rollbackTimeout uint) error
+		// SetLogging(level string, domains string) error
+		// GetLogging() (string, string, error)
+		// CheckConnectivity() (ConnectivityState, error)
+		// GetState() (StateEnum, error)
+		// CheckpointCreate(devices []Device, rollbackTimeout uint, flags CheckpointCreateFlags) (Checkpoint, error)
+		// CheckpointDestroy(checkpoint Checkpoint) error
+		// CheckpointRollback(checkpoint Checkpoint) (map[dbus.ObjectPath]RollbackResult, error)
+		// CheckpointAdjustRollbackTimeout(checkpoint Checkpoint, rollbackTimeout uint) error
 
 		// Properties
 
@@ -207,6 +207,80 @@ func ActivateConnection(connection interface{}, device interface{}, specificObje
 	return nm.ActivateConnection(connection, device, specificObject)
 }
 
+func (nm *networkManager) AddAndActivateConnection(connection SettingsConnectionInput, device interface{}, specificObject interface{}) (SettingsConnection, ConnectionActive, error) {
+	devicePath, err := dbusext.ObjectPath(device)
+	if err != nil {
+		return nil, nil, err
+	}
+	specificObjectPath, err := dbusext.ObjectPath(specificObject)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var settingsConnectionPath, connectionActivePath dbus.ObjectPath
+
+	if err := nm.CallAndStore(
+		NetworkManagerInterface+".AddAndActivateConnection",
+		dbusext.Args{connection, devicePath, specificObjectPath},
+		dbusext.Args{&settingsConnectionPath, &connectionActivePath},
+	); err != nil {
+		return nil, nil, err
+	}
+
+	settingsConnection := NewSettingsConnection(nm.Conn, settingsConnectionPath)
+	connectionActive, err := NewConnectionActive(nm.Conn, connectionActivePath)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return settingsConnection, connectionActive, nil
+}
+
+func AddAndActivateConnection(connection SettingsConnectionInput, device interface{}, specificObject interface{}) (SettingsConnection, ConnectionActive, error) {
+	nm, err := System()
+	if err != nil {
+		return nil, nil, err
+	}
+	return nm.AddAndActivateConnection(connection, device, specificObject)
+}
+
+func (nm *networkManager) AddAndActivateConnection2(connection SettingsConnectionInput, device interface{}, specificObject interface{}, options map[string]interface{}) (SettingsConnection, ConnectionActive, error) {
+	devicePath, err := dbusext.ObjectPath(device)
+	if err != nil {
+		return nil, nil, err
+	}
+	specificObjectPath, err := dbusext.ObjectPath(specificObject)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var settingsConnectionPath, connectionActivePath dbus.ObjectPath
+
+	if err := nm.CallAndStore(
+		NetworkManagerInterface+".AddAndActivateConnection2",
+		dbusext.Args{connection, devicePath, specificObjectPath, options},
+		dbusext.Args{&settingsConnectionPath, &connectionActivePath},
+	); err != nil {
+		return nil, nil, err
+	}
+
+	settingsConnection := NewSettingsConnection(nm.Conn, settingsConnectionPath)
+	connectionActive, err := NewConnectionActive(nm.Conn, connectionActivePath)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return settingsConnection, connectionActive, nil
+}
+
+func AddAndActivateConnection2(connection SettingsConnectionInput, device interface{}, specificObject interface{}, options map[string]interface{}) (SettingsConnection, ConnectionActive, error) {
+	nm, err := System()
+	if err != nil {
+		return nil, nil, err
+	}
+	return nm.AddAndActivateConnection2(connection, device, specificObject, options)
+}
+
 func (nm *networkManager) DeactivateConnection(activeConnection interface{}) error {
 	activeConnectionPath, err := dbusext.ObjectPath(activeConnection)
 	if err != nil {
@@ -229,6 +303,46 @@ func DeactivateConnection(activeConnection interface{}) error {
 
 func (nm *networkManager) Devices() ([]Device, error) {
 	return nm.devices("Devices")
+}
+
+func (nm *networkManager) Sleep(sleep bool) error {
+	return nm.CallAndStore(NetworkManagerInterface+".Sleep", dbusext.Args{sleep}, nil)
+}
+
+func Sleep(sleep bool) error {
+	nm, err := System()
+	if err != nil {
+		return err
+	}
+	return nm.Sleep(sleep)
+}
+
+func (nm *networkManager) Enable(enable bool) error {
+	return nm.CallAndStore(NetworkManagerInterface+".Enable", dbusext.Args{enable}, nil)
+}
+
+func Enable(enable bool) error {
+	nm, err := System()
+	if err != nil {
+		return err
+	}
+	return nm.Enable(enable)
+}
+
+func (nm *networkManager) GetPermissions() (map[string]string, error) {
+	var permissions = make(map[string]string)
+	if err := nm.CallAndStore(NetworkManagerInterface+".GetPermissions", nil, dbusext.Args{permissions}); err != nil {
+		return nil, err
+	}
+	return permissions, nil
+}
+
+func GetPermissions() (map[string]string, error) {
+	nm, err := System()
+	if err != nil {
+		return nil, err
+	}
+	return nm.GetPermissions()
 }
 
 // Devices is the list of realized network devices.

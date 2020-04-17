@@ -7,9 +7,9 @@ import (
 )
 
 func main() {
-	config, err := netmgr.GlobalDNSConfiguration()
+	permissions, err := netmgr.GetPermissions()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%#v", config)
+	fmt.Printf("%#v\n", permissions)
 }
