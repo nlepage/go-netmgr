@@ -46,6 +46,17 @@ func NewConnectionActive(conn *dbus.Conn, path dbus.ObjectPath) (ConnectionActiv
 	return &ca, nil
 }
 
+func NewConnectionActives(conn *dbus.Conn, paths []dbus.ObjectPath) ([]ConnectionActive, error) {
+	connectionActives := make([]ConnectionActive, len(paths))
+	var err error
+	for i, path := range paths {
+		if connectionActives[i], err = NewConnectionActive(conn, path); err != nil {
+			return nil, err
+		}
+	}
+	return connectionActives, nil
+}
+
 func (ca *connectionActive) Vpn() (bool, error) {
 	return ca.GetBProperty(ConnectionActiveIface + ".Vpn")
 }

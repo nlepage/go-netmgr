@@ -62,3 +62,19 @@ func (o *BusObject) GetAASVProperty(name string) ([]map[string]interface{}, erro
 	}
 	return vi, nil
 }
+
+func (o *BusObject) GetOProperty(name string) (dbus.ObjectPath, error) {
+	p, err := o.GetProperty(name)
+	if err != nil {
+		return "", err
+	}
+	return p.Value().(dbus.ObjectPath), nil
+}
+
+func (o *BusObject) GetAOProperty(name string) ([]dbus.ObjectPath, error) {
+	p, err := o.GetProperty(name)
+	if err != nil {
+		return nil, err
+	}
+	return p.Value().([]dbus.ObjectPath), nil
+}

@@ -2,6 +2,7 @@ package netmgr
 
 import (
 	"github.com/godbus/dbus/v5"
+	"github.com/nlepage/go-netmgr/internal/dbusext"
 )
 
 // CheckpointIface is the Checkpoint interface.
@@ -14,4 +15,22 @@ type (
 	Checkpoint interface {
 		dbus.BusObject
 	}
+
+	checkpoint struct {
+		dbusext.BusObject
+	}
 )
+
+var _ Checkpoint = (*checkpoint)(nil)
+
+func NewCheckpoint(conn *dbus.Conn, path dbus.ObjectPath) Checkpoint {
+	return &checkpoint{dbusext.NewBusObject(conn, BusName, path)}
+}
+
+func NewCheckpoints(conn *dbus.Conn, paths []dbus.ObjectPath) []Checkpoint {
+	checkpoints := make([]Checkpoint, len(paths))
+	for i, path := range paths {
+		checkpoints[i] = NewCheckpoint(conn, path)
+	}
+	return checkpoints
+}

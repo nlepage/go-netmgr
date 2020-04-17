@@ -60,6 +60,14 @@ func NewDevice(conn *dbus.Conn, path dbus.ObjectPath) Device {
 	return &device{dbusext.NewBusObject(conn, BusName, path)}
 }
 
+func NewDevices(conn *dbus.Conn, paths []dbus.ObjectPath) []Device {
+	devices := make([]Device, len(paths))
+	for i, path := range paths {
+		devices[i] = NewDevice(conn, path)
+	}
+	return devices
+}
+
 func (d *device) Udi() (string, error) {
 	return d.GetSProperty(DeviceIface + ".Udi")
 }
