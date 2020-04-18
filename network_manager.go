@@ -1,6 +1,8 @@
 package netmgr
 
 import (
+	"strconv"
+
 	"github.com/godbus/dbus/v5"
 
 	"github.com/nlepage/go-netmgr/internal/dbusext"
@@ -35,9 +37,9 @@ type (
 		Sleep(sleep bool) error
 		Enable(enable bool) error
 		GetPermissions() (map[string]string, error)
-		// SetLogging(level string, domains string) error
-		// GetLogging() (string, string, error)
-		// CheckConnectivity() (ConnectivityState, error)
+		SetLogging(level string, domains string) error
+		GetLogging() (string, string, error)
+		CheckConnectivity() (ConnectivityState, error)
 		// GetState() (StateEnum, error)
 		// CheckpointCreate(devices []Device, rollbackTimeout uint, flags CheckpointCreateFlags) (Checkpoint, error)
 		// CheckpointDestroy(checkpoint Checkpoint) error
@@ -343,6 +345,51 @@ func GetPermissions() (map[string]string, error) {
 		return nil, err
 	}
 	return nm.GetPermissions()
+}
+
+func (nm *networkManager) SetLogging(level string, domains string) error {
+	return nm.CallAndStore(NetworkManagerInterface+".SetLogging", dbusext.Args{level, domains}, nil)
+}
+
+func SetLogging(level string, domains string) error {
+	nm, err := System()
+	if err != nil {
+		return err
+	}
+	return nm.SetLogging(level, domains)
+}
+
+func (nm *networkManager) GetLogging() (string, string, error) {
+	var level string
+	var domains string
+	if err := nm.CallAndStore(NetworkManagerInterface+".GetLogging", nil, dbusext.Args{&level, &domains}); err != nil {
+		return "", "", err
+	}
+	return level, domains, nil
+}
+
+func GetLogging() (string, string, error) {
+	nm, err := System()
+	if err != nil {
+		return "", "", err
+	}
+	return nm.GetLogging()
+}
+
+func (nm *networkManager) CheckConnectivity() (ConnectivityState, error) {
+	var connectivity ConnectivityState
+	if err := nm.CallAndStore(NetworkManagerInterface+".CheckConnectivity", nil, dbusext.Args{&connectivity}); err != nil {
+		return ConnectivityState(0), err
+	}
+	return connectivity, nil
+}
+
+func CheckConnectivity() (ConnectivityState, error) {
+	nm, err := System()
+	if err != nil {
+		return ConnectivityState(0), err
+	}
+	return nm.CheckConnectivity()
 }
 
 // Devices is the list of realized network devices.
@@ -779,6 +826,8 @@ const (
 	CapabilityOVS
 )
 
+// FIXME Capability.String()
+
 // StateEnum values indicate the current overall networking state.
 //
 // See https://developer.gnome.org/NetworkManager/stable/nm-dbus-types.html#NMState for more information.
@@ -810,6 +859,8 @@ const (
 	StateConnectedGlobal
 )
 
+// FIXME StateEnum.String()
+
 // ConnectivityState values indicate the connectivity state.
 //
 // See https://developer.gnome.org/NetworkManager/stable/nm-dbus-types.html#NMConnectivityState for more information.
@@ -832,6 +883,28 @@ const (
 	ConnectivityFull
 )
 
+func (cs ConnectivityState) String() string {
+	switch cs {
+	case ConnectivityUnknown:
+		return "NM_CONNECTIVITY_UNKNOWN"
+	case ConnectivityNone:
+		return "NM_CONNECTIVITY_NONE"
+	case ConnectivityPortal:
+		return "NM_CONNECTIVITY_PORTAL"
+	case ConnectivityLimited:
+		return "NM_CONNECTIVITY_LIMITED"
+	case ConnectivityFull:
+		return "NM_CONNECTIVITY_FULL"
+	}
+	return strconv.Itoa(int(cs))
+}
+
 type CheckpointCreateFlags uint
 
+// FIXME CheckpointCreateFlags values
+// FIXME CheckpointCreateFlags.String()
+
 type RollbackResult uint
+
+// FIXME RollbackResult values
+// FIXME RollbackResult.String()

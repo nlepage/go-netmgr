@@ -85,20 +85,20 @@ func (o *BusObject) GetAOProperty(name string) ([]dbus.ObjectPath, error) {
 	return p.Value().([]dbus.ObjectPath), nil
 }
 
-func (o *BusObject) GetUProperty(name string) (uint, error) {
+func (o *BusObject) GetUProperty(name string) (uint32, error) {
 	p, err := o.GetProperty(name)
 	if err != nil {
 		return 0, err
 	}
-	return p.Value().(uint), nil
+	return p.Value().(uint32), nil
 }
 
-func (o *BusObject) GetAUProperty(name string) ([]uint, error) {
+func (o *BusObject) GetAUProperty(name string) ([]uint32, error) {
 	p, err := o.GetProperty(name)
 	if err != nil {
 		return nil, err
 	}
-	return p.Value().([]uint), nil
+	return p.Value().([]uint32), nil
 }
 
 func ASV2ASI(asv map[string]dbus.Variant) map[string]interface{} {

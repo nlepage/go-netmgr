@@ -7,9 +7,9 @@ import (
 )
 
 func main() {
-	permissions, err := netmgr.GetPermissions()
+	connectivity, err := netmgr.Connectivity()
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("%#v\n", permissions)
+	fmt.Println(connectivity)
 }
