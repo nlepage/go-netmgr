@@ -44,6 +44,8 @@ type (
 		CheckpointRollback(checkpoint interface{}) (map[dbus.ObjectPath]RollbackResult, error)
 		CheckpointAdjustRollbackTimeout(checkpoint interface{}, rollbackTimeout uint) error
 
+		// FIXME Signals
+
 		// Properties
 
 		Devices() ([]Device, error)
