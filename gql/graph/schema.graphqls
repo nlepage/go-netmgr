@@ -1,5 +1,7 @@
 type NetworkManager {
   connectivity: ConnectivityState!
+  connectivityCheckAvailable: Boolean!
+  connectivityCheckEnabled: Boolean!
 }
 
 input NetworkManagerInput {

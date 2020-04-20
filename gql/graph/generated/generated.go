@@ -49,7 +49,9 @@ type ComplexityRoot struct {
 	}
 
 	NetworkManager struct {
-		Connectivity func(childComplexity int) int
+		Connectivity               func(childComplexity int) int
+		ConnectivityCheckAvailable func(childComplexity int) int
+		ConnectivityCheckEnabled   func(childComplexity int) int
 	}
 
 	Query struct {
@@ -97,6 +99,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NetworkManager.Connectivity(childComplexity), true
+
+	case "NetworkManager.connectivityCheckAvailable":
+		if e.complexity.NetworkManager.ConnectivityCheckAvailable == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.ConnectivityCheckAvailable(childComplexity), true
+
+	case "NetworkManager.connectivityCheckEnabled":
+		if e.complexity.NetworkManager.ConnectivityCheckEnabled == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.ConnectivityCheckEnabled(childComplexity), true
 
 	case "Query.networkManager":
 		if e.complexity.Query.NetworkManager == nil {
@@ -171,6 +187,8 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 var sources = []*ast.Source{
 	&ast.Source{Name: "graph/schema.graphqls", Input: `type NetworkManager {
   connectivity: ConnectivityState!
+  connectivityCheckAvailable: Boolean!
+  connectivityCheckEnabled: Boolean!
 }
 
 input NetworkManagerInput {
@@ -336,6 +354,74 @@ func (ec *executionContext) _NetworkManager_connectivity(ctx context.Context, fi
 	res := resTmp.(netmgr.ConnectivityState)
 	fc.Result = res
 	return ec.marshalNConnectivityState2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐConnectivityState(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_connectivityCheckAvailable(ctx context.Context, field graphql.CollectedField, obj *model.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConnectivityCheckAvailable()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_connectivityCheckEnabled(ctx context.Context, field graphql.CollectedField, obj *model.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConnectivityCheckEnabled()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_networkManager(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1566,6 +1652,16 @@ func (ec *executionContext) _NetworkManager(ctx context.Context, sel ast.Selecti
 			out.Values[i] = graphql.MarshalString("NetworkManager")
 		case "connectivity":
 			out.Values[i] = ec._NetworkManager_connectivity(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "connectivityCheckAvailable":
+			out.Values[i] = ec._NetworkManager_connectivityCheckAvailable(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "connectivityCheckEnabled":
+			out.Values[i] = ec._NetworkManager_connectivityCheckEnabled(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
