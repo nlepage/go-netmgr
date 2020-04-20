@@ -40,11 +40,11 @@ type (
 		SetLogging(level string, domains string) error
 		GetLogging() (string, string, error)
 		CheckConnectivity() (ConnectivityState, error)
-		// GetState() (StateEnum, error)
-		// CheckpointCreate(devices []Device, rollbackTimeout uint, flags CheckpointCreateFlags) (Checkpoint, error)
-		// CheckpointDestroy(checkpoint Checkpoint) error
-		// CheckpointRollback(checkpoint Checkpoint) (map[dbus.ObjectPath]RollbackResult, error)
-		// CheckpointAdjustRollbackTimeout(checkpoint Checkpoint, rollbackTimeout uint) error
+		GetState() (StateEnum, error)
+		CheckpointCreate(devices []interface{}, rollbackTimeout uint, flags CheckpointCreateFlags) (Checkpoint, error)
+		CheckpointDestroy(checkpoint interface{}) error
+		CheckpointRollback(checkpoint interface{}) (map[dbus.ObjectPath]RollbackResult, error)
+		CheckpointAdjustRollbackTimeout(checkpoint interface{}, rollbackTimeout uint) error
 
 		// Properties
 
@@ -379,7 +379,7 @@ func GetLogging() (string, string, error) {
 func (nm *networkManager) CheckConnectivity() (ConnectivityState, error) {
 	var connectivity ConnectivityState
 	if err := nm.CallAndStore(NetworkManagerInterface+".CheckConnectivity", nil, dbusext.Args{&connectivity}); err != nil {
-		return ConnectivityState(0), err
+		return ConnectivityUnknown, err
 	}
 	return connectivity, nil
 }
@@ -387,9 +387,103 @@ func (nm *networkManager) CheckConnectivity() (ConnectivityState, error) {
 func CheckConnectivity() (ConnectivityState, error) {
 	nm, err := System()
 	if err != nil {
-		return ConnectivityState(0), err
+		return ConnectivityUnknown, err
 	}
 	return nm.CheckConnectivity()
+}
+
+func (nm *networkManager) GetState() (StateEnum, error) {
+	var state StateEnum
+	if err := nm.CallAndStore(NetworkManagerInterface+".GetState", nil, dbusext.Args{&state}); err != nil {
+		return StateUnknown, err
+	}
+	return state, nil
+}
+
+func GetState() (StateEnum, error) {
+	nm, err := System()
+	if err != nil {
+		return StateUnknown, err
+	}
+	return nm.GetState()
+}
+
+func (nm *networkManager) CheckpointCreate(devices []interface{}, rollbackTimeout uint, flags CheckpointCreateFlags) (Checkpoint, error) {
+	devicesPaths := make([]dbus.ObjectPath, len(devices))
+	var err error
+	for i, device := range devices {
+		if devicesPaths[i], err = dbusext.ObjectPath(device); err != nil {
+			return nil, err
+		}
+	}
+
+	var checkpointPath dbus.ObjectPath
+
+	if err := nm.CallAndStore(NetworkManagerInterface+".CheckpointCreate", dbusext.Args{devicesPaths, rollbackTimeout, flags}, dbusext.Args{&checkpointPath}); err != nil {
+		return nil, err
+	}
+
+	return NewCheckpoint(nm.Conn, checkpointPath), nil
+}
+
+func CheckpointCreate(devices []interface{}, rollbackTimeout uint, flags CheckpointCreateFlags) (Checkpoint, error) {
+	nm, err := System()
+	if err != nil {
+		return nil, err
+	}
+	return nm.CheckpointCreate(devices, rollbackTimeout, flags)
+}
+
+func (nm *networkManager) CheckpointDestroy(checkpoint interface{}) error {
+	checkpointPath, err := dbusext.ObjectPath(checkpoint)
+	if err != nil {
+		return err
+	}
+	return nm.CallAndStore(NetworkManagerInterface+".CheckpointDestroy", dbusext.Args{checkpointPath}, nil)
+}
+
+func CheckpointDestroy(checkpoint interface{}) error {
+	nm, err := System()
+	if err != nil {
+		return err
+	}
+	return nm.CheckpointDestroy(checkpoint)
+}
+
+func (nm *networkManager) CheckpointRollback(checkpoint interface{}) (map[dbus.ObjectPath]RollbackResult, error) {
+	checkpointPath, err := dbusext.ObjectPath(checkpoint)
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[dbus.ObjectPath]RollbackResult)
+	if err := nm.CallAndStore(NetworkManagerInterface+".CheckpointRollback", dbusext.Args{checkpointPath}, dbusext.Args{result}); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func CheckpointRollback(checkpoint interface{}) (map[dbus.ObjectPath]RollbackResult, error) {
+	nm, err := System()
+	if err != nil {
+		return nil, err
+	}
+	return nm.CheckpointRollback(checkpoint)
+}
+
+func (nm *networkManager) CheckpointAdjustRollbackTimeout(checkpoint interface{}, rollbackTimeout uint) error {
+	checkpointPath, err := dbusext.ObjectPath(checkpoint)
+	if err != nil {
+		return err
+	}
+	return nm.CallAndStore(NetworkManagerInterface+".CheckpointAdjustRollbackTimeout", dbusext.Args{checkpointPath, rollbackTimeout}, nil)
+}
+
+func CheckpointAdjustRollbackTimeout(checkpoint interface{}, rollbackTimeout uint) error {
+	nm, err := System()
+	if err != nil {
+		return err
+	}
+	return nm.CheckpointAdjustRollbackTimeout(checkpoint, rollbackTimeout)
 }
 
 // Devices is the list of realized network devices.
@@ -614,7 +708,7 @@ func (nm *networkManager) Metered() (MeteredEnum, error) {
 func Metered() (MeteredEnum, error) {
 	nm, err := System()
 	if err != nil {
-		return MeteredEnum(0), err
+		return MeteredUnknown, err
 	}
 	return nm.Metered()
 }
@@ -702,7 +796,7 @@ func (nm *networkManager) State() (StateEnum, error) {
 func State() (StateEnum, error) {
 	nm, err := System()
 	if err != nil {
-		return StateEnum(0), err
+		return StateUnknown, err
 	}
 	return nm.State()
 }
@@ -718,7 +812,7 @@ func (nm *networkManager) Connectivity() (ConnectivityState, error) {
 func Connectivity() (ConnectivityState, error) {
 	nm, err := System()
 	if err != nil {
-		return ConnectivityState(0), err
+		return ConnectivityUnknown, err
 	}
 	return nm.Connectivity()
 }
@@ -904,7 +998,23 @@ type CheckpointCreateFlags uint
 // FIXME CheckpointCreateFlags values
 // FIXME CheckpointCreateFlags.String()
 
+// RollbackResult is the result of a checkpoint Rollback() operation for a specific device.
+//
+// See https://developer.gnome.org/NetworkManager/stable/nm-dbus-types.html#NMRollbackResult for more information.
 type RollbackResult uint
 
-// FIXME RollbackResult values
+const (
+	// RollbackResultOK means the rollback succeeded.
+	RollbackResultOK RollbackResult = iota
+
+	// RollbackResultErrNoDevice means the device no longer exists.
+	RollbackResultErrNoDevice
+
+	// RollbackResultErrDeviceUnmanaged means the device is now unmanaged.
+	RollbackResultErrDeviceUnmanaged
+
+	// RollbackResultErrFailed means other errors during rollback.
+	RollbackResultErrFailed
+)
+
 // FIXME RollbackResult.String()
