@@ -2,6 +2,7 @@ package netmgr
 
 import (
 	"github.com/godbus/dbus/v5"
+
 	"github.com/nlepage/go-netmgr/internal/dbusext"
 )
 
