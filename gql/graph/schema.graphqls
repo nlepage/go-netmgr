@@ -1,0 +1,23 @@
+type NetworkManager {
+  connectivity: ConnectivityState!
+}
+
+input NetworkManagerInput {
+  wirelessEnabled: Boolean!
+}
+
+type Query {
+  networkManager: NetworkManager!
+}
+
+type Mutation {
+  networkManager(input: NetworkManagerInput!): NetworkManager!
+}
+
+enum ConnectivityState {
+  Unknown
+  None
+  Portal
+  Limited
+  Full
+}
