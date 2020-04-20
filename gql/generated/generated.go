@@ -13,7 +13,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/nlepage/go-netmgr"
-	"github.com/nlepage/go-netmgr/gql/graph/model"
+	"github.com/nlepage/go-netmgr/gql/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -185,7 +185,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	&ast.Source{Name: "graph/schema.graphqls", Input: `type NetworkManager {
+	&ast.Source{Name: "schema.graphqls", Input: `type NetworkManager {
   connectivity: ConnectivityState!
   connectivityCheckAvailable: Boolean!
   connectivityCheckEnabled: Boolean!
@@ -222,7 +222,7 @@ func (ec *executionContext) field_Mutation_networkManager_args(ctx context.Conte
 	args := map[string]interface{}{}
 	var arg0 model.NetworkManagerInput
 	if tmp, ok := rawArgs["input"]; ok {
-		arg0, err = ec.unmarshalNNetworkManagerInput2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚋgqlᚋgraphᚋmodelᚐNetworkManagerInput(ctx, tmp)
+		arg0, err = ec.unmarshalNNetworkManagerInput2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚋgqlᚋmodelᚐNetworkManagerInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -319,7 +319,7 @@ func (ec *executionContext) _Mutation_networkManager(ctx context.Context, field 
 	}
 	res := resTmp.(*model.NetworkManager)
 	fc.Result = res
-	return ec.marshalNNetworkManager2ᚖgithubᚗcomᚋnlepageᚋgoᚑnetmgrᚋgqlᚋgraphᚋmodelᚐNetworkManager(ctx, field.Selections, res)
+	return ec.marshalNNetworkManager2ᚖgithubᚗcomᚋnlepageᚋgoᚑnetmgrᚋgqlᚋmodelᚐNetworkManager(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NetworkManager_connectivity(ctx context.Context, field graphql.CollectedField, obj *model.NetworkManager) (ret graphql.Marshaler) {
@@ -455,7 +455,7 @@ func (ec *executionContext) _Query_networkManager(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.NetworkManager)
 	fc.Result = res
-	return ec.marshalNNetworkManager2ᚖgithubᚗcomᚋnlepageᚋgoᚑnetmgrᚋgqlᚋgraphᚋmodelᚐNetworkManager(ctx, field.Selections, res)
+	return ec.marshalNNetworkManager2ᚖgithubᚗcomᚋnlepageᚋgoᚑnetmgrᚋgqlᚋmodelᚐNetworkManager(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1993,11 +1993,11 @@ func (ec *executionContext) marshalNConnectivityState2githubᚗcomᚋnlepageᚋg
 	return res
 }
 
-func (ec *executionContext) marshalNNetworkManager2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚋgqlᚋgraphᚋmodelᚐNetworkManager(ctx context.Context, sel ast.SelectionSet, v model.NetworkManager) graphql.Marshaler {
+func (ec *executionContext) marshalNNetworkManager2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚋgqlᚋmodelᚐNetworkManager(ctx context.Context, sel ast.SelectionSet, v model.NetworkManager) graphql.Marshaler {
 	return ec._NetworkManager(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNNetworkManager2ᚖgithubᚗcomᚋnlepageᚋgoᚑnetmgrᚋgqlᚋgraphᚋmodelᚐNetworkManager(ctx context.Context, sel ast.SelectionSet, v *model.NetworkManager) graphql.Marshaler {
+func (ec *executionContext) marshalNNetworkManager2ᚖgithubᚗcomᚋnlepageᚋgoᚑnetmgrᚋgqlᚋmodelᚐNetworkManager(ctx context.Context, sel ast.SelectionSet, v *model.NetworkManager) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -2007,7 +2007,7 @@ func (ec *executionContext) marshalNNetworkManager2ᚖgithubᚗcomᚋnlepageᚋg
 	return ec._NetworkManager(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNNetworkManagerInput2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚋgqlᚋgraphᚋmodelᚐNetworkManagerInput(ctx context.Context, v interface{}) (model.NetworkManagerInput, error) {
+func (ec *executionContext) unmarshalNNetworkManagerInput2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚋgqlᚋmodelᚐNetworkManagerInput(ctx context.Context, v interface{}) (model.NetworkManagerInput, error) {
 	return ec.unmarshalInputNetworkManagerInput(ctx, v)
 }
 

@@ -7,8 +7,9 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/nlepage/go-netmgr/gql/graph"
-	"github.com/nlepage/go-netmgr/gql/graph/generated"
+
+	netmgrgql "github.com/nlepage/go-netmgr/gql"
+	"github.com/nlepage/go-netmgr/gql/generated"
 )
 
 const defaultPort = "8080"
@@ -19,7 +20,7 @@ func main() {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &netmgrgql.Resolver{}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)

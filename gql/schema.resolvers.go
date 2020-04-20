@@ -1,4 +1,4 @@
-package graph
+package netmgrgql
 
 // This file will be automatically regenerated based on the schema, any resolver implementations
 // will be copied through when generating and any unknown code will be moved to the end.
@@ -8,8 +8,8 @@ import (
 	"fmt"
 
 	"github.com/nlepage/go-netmgr"
-	"github.com/nlepage/go-netmgr/gql/graph/generated"
-	"github.com/nlepage/go-netmgr/gql/graph/model"
+	"github.com/nlepage/go-netmgr/gql/generated"
+	"github.com/nlepage/go-netmgr/gql/model"
 )
 
 func (r *mutationResolver) NetworkManager(ctx context.Context, input model.NetworkManagerInput) (*model.NetworkManager, error) {
