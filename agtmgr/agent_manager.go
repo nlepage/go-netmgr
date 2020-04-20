@@ -49,7 +49,7 @@ func New(conn *dbus.Conn) AgentManager {
 // It is equivalent to:
 //  conn, err := dbus.SystemBus()
 //  if err != nil {
-//      return nil, err
+//      // Manage error
 //  }
 //  nm := agtmgr.New(conn)
 func System() (AgentManager, error) {

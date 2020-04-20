@@ -93,7 +93,7 @@ func New(conn *dbus.Conn) NetworkManager {
 // It is equivalent to:
 //  conn, err := dbus.SystemBus()
 //  if err != nil {
-//      return nil, err
+//      // Manager error
 //  }
 //  nm := netmgr.New(conn)
 func System() (NetworkManager, error) {

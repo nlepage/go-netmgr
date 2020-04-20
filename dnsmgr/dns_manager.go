@@ -45,7 +45,7 @@ func New(conn *dbus.Conn) DNSManager {
 // It is equivalent to:
 //  conn, err := dbus.SystemBus()
 //  if err != nil {
-//      return nil, err
+//      // Manage error
 //  }
 //  nm := dnsmgr.New(conn)
 func System() (DNSManager, error) {
