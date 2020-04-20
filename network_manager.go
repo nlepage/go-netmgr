@@ -238,6 +238,9 @@ func (nm *networkManager) AddAndActivateConnection(connection SettingsConnection
 	return settingsConnection, connectionActive, nil
 }
 
+// AddAndActivateConnection adds a new connection using the given details (if any) as a template (automatically filling in missing settings with the capabilities of the given device and specific object), then activate the new connection.
+//
+// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.AddAndActivateConnection for more information.
 func AddAndActivateConnection(connection SettingsConnectionInput, device interface{}, specificObject interface{}) (SettingsConnection, ConnectionActive, error) {
 	nm, err := System()
 	if err != nil {
@@ -275,6 +278,9 @@ func (nm *networkManager) AddAndActivateConnection2(connection SettingsConnectio
 	return settingsConnection, connectionActive, nil
 }
 
+// AddAndActivateConnection2 adds a new connection using the given details (if any) as a template (automatically filling in missing settings with the capabilities of the given device and specific object), then activate the new connection.
+//
+// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.AddAndActivateConnection2 for more information.
 func AddAndActivateConnection2(connection SettingsConnectionInput, device interface{}, specificObject interface{}, options map[string]interface{}) (SettingsConnection, ConnectionActive, error) {
 	nm, err := System()
 	if err != nil {
@@ -311,6 +317,9 @@ func (nm *networkManager) Sleep(sleep bool) error {
 	return nm.CallAndStore(NetworkManagerInterface+".Sleep", dbusext.Args{sleep}, nil)
 }
 
+// Sleep controls the NetworkManager daemon's sleep state.
+//
+// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.Sleep for more information.
 func Sleep(sleep bool) error {
 	nm, err := System()
 	if err != nil {
@@ -323,6 +332,9 @@ func (nm *networkManager) Enable(enable bool) error {
 	return nm.CallAndStore(NetworkManagerInterface+".Enable", dbusext.Args{enable}, nil)
 }
 
+// Enable control whether overall networking is enabled or disabled.
+//
+// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.Enable for more information.
 func Enable(enable bool) error {
 	nm, err := System()
 	if err != nil {
@@ -339,6 +351,9 @@ func (nm *networkManager) GetPermissions() (map[string]string, error) {
 	return permissions, nil
 }
 
+// GetPermissions returns the permissions a caller has for various authenticated operations that NetworkManager provides, like Enable/Disable networking, changing Wi-Fi, WWAN, and WiMAX state, etc.
+//
+// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.GetPermissions for more information.
 func GetPermissions() (map[string]string, error) {
 	nm, err := System()
 	if err != nil {
@@ -351,6 +366,9 @@ func (nm *networkManager) SetLogging(level string, domains string) error {
 	return nm.CallAndStore(NetworkManagerInterface+".SetLogging", dbusext.Args{level, domains}, nil)
 }
 
+// SetLogging sets logging verbosity and which operations are logged.
+//
+// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.SetLogging for more information.
 func SetLogging(level string, domains string) error {
 	nm, err := System()
 	if err != nil {
@@ -368,6 +386,9 @@ func (nm *networkManager) GetLogging() (string, string, error) {
 	return level, domains, nil
 }
 
+// GetLogging gets current logging verbosity level and operations domains.
+//
+// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.GetLogging for more information.
 func GetLogging() (string, string, error) {
 	nm, err := System()
 	if err != nil {
@@ -384,6 +405,9 @@ func (nm *networkManager) CheckConnectivity() (ConnectivityState, error) {
 	return connectivity, nil
 }
 
+// CheckConnectivity re-checks the network connectivity state.
+//
+// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.CheckConnectivity for more information.
 func CheckConnectivity() (ConnectivityState, error) {
 	nm, err := System()
 	if err != nil {
@@ -400,6 +424,9 @@ func (nm *networkManager) GetState() (StateEnum, error) {
 	return state, nil
 }
 
+// GetState gets the overall networking state as determined by the NetworkManager daemon, based on the state of network devices under its management.
+//
+// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.state for more information.
 func GetState() (StateEnum, error) {
 	nm, err := System()
 	if err != nil {
@@ -426,6 +453,9 @@ func (nm *networkManager) CheckpointCreate(devices []interface{}, rollbackTimeou
 	return NewCheckpoint(nm.Conn, checkpointPath), nil
 }
 
+// CheckpointCreate creates a checkpoint of the current networking configuration for given interfaces.
+//
+// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.CheckpointCreate for more information.
 func CheckpointCreate(devices []interface{}, rollbackTimeout uint, flags CheckpointCreateFlags) (Checkpoint, error) {
 	nm, err := System()
 	if err != nil {
@@ -442,6 +472,9 @@ func (nm *networkManager) CheckpointDestroy(checkpoint interface{}) error {
 	return nm.CallAndStore(NetworkManagerInterface+".CheckpointDestroy", dbusext.Args{checkpointPath}, nil)
 }
 
+// CheckpointDestroy destroys a previously created checkpoint.
+//
+// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.CheckpointDestroy for more information.
 func CheckpointDestroy(checkpoint interface{}) error {
 	nm, err := System()
 	if err != nil {
@@ -462,6 +495,9 @@ func (nm *networkManager) CheckpointRollback(checkpoint interface{}) (map[dbus.O
 	return result, nil
 }
 
+// CheckpointRollback rollback a checkpoint before the timeout is reached.
+//
+// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.CheckpointRollback for more information.
 func CheckpointRollback(checkpoint interface{}) (map[dbus.ObjectPath]RollbackResult, error) {
 	nm, err := System()
 	if err != nil {
@@ -478,6 +514,9 @@ func (nm *networkManager) CheckpointAdjustRollbackTimeout(checkpoint interface{}
 	return nm.CallAndStore(NetworkManagerInterface+".CheckpointAdjustRollbackTimeout", dbusext.Args{checkpointPath, rollbackTimeout}, nil)
 }
 
+// CheckpointAdjustRollbackTimeout resets the timeout for rollback for the checkpoint.
+//
+// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-method-org-freedesktop-NetworkManager.CheckpointAdjustRollbackTimeout for more information.
 func CheckpointAdjustRollbackTimeout(checkpoint interface{}, rollbackTimeout uint) error {
 	nm, err := System()
 	if err != nil {
@@ -993,9 +1032,28 @@ func (cs ConnectivityState) String() string {
 	return strconv.Itoa(int(cs))
 }
 
+// CheckpointCreateFlags are the flags for CheckpointCreate call.
+//
+// See https://developer.gnome.org/NetworkManager/stable/nm-dbus-types.html#NMCheckpointCreateFlags for more information.
 type CheckpointCreateFlags uint
 
-// FIXME CheckpointCreateFlags values
+const (
+	// CheckpointCreateFlagNone means no flags.
+	CheckpointCreateFlagNone CheckpointCreateFlags = 0
+
+	// CheckpointCreateFlagDestroyAll means when creating a new checkpoint, destroy all existing ones.
+	CheckpointCreateFlagDestroyAll = 1 << (iota - 1)
+
+	// CheckpointCreateFlagDeleteNewConnections means upon rollback, delete any new connection added after the checkpoint.
+	CheckpointCreateFlagDeleteNewConnections
+
+	// CheckpointCreateFlagDisconnectNewDevices means upon rollback, disconnect any new device appeared after the checkpoint.
+	CheckpointCreateFlagDisconnectNewDevices
+
+	// CheckpointCreateFlagAllowOverlapping means creating a checkpoint doesn't fail if there are already existing checkoints that reference the same devices.
+	CheckpointCreateFlagAllowOverlapping
+)
+
 // FIXME CheckpointCreateFlags.String()
 
 // RollbackResult is the result of a checkpoint Rollback() operation for a specific device.
