@@ -1,5 +1,9 @@
 package netmgr
 
+import (
+	"github.com/godbus/dbus/v5"
+)
+
 // Devices is the list of realized network devices.
 //
 // See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.html#gdbus-property-org-freedesktop-NetworkManager.Devices for more information.
@@ -84,7 +88,7 @@ func WirelessEnabled() (bool, error) {
 }
 
 func (nm *networkManager) SetWirelessEnabled(value bool) error {
-	return nm.SetProperty(NetworkManagerInterface+".WirelessEnabled", value)
+	return nm.SetProperty(NetworkManagerInterface+".WirelessEnabled", dbus.MakeVariant(value))
 }
 
 // SetWirelessEnabled enables or disables wireless.
@@ -129,7 +133,7 @@ func WwanEnabled() (bool, error) {
 }
 
 func (nm *networkManager) SetWwanEnabled(value bool) error {
-	return nm.SetProperty(NetworkManagerInterface+".WwanEnabled", value)
+	return nm.SetProperty(NetworkManagerInterface+".WwanEnabled", dbus.MakeVariant(value))
 }
 
 // SetWwanEnabled enables or disables mobile broadband devices.
@@ -362,7 +366,7 @@ func ConnectivityCheckEnabled() (bool, error) {
 }
 
 func (nm *networkManager) SetConnectivityCheckEnabled(value bool) error {
-	return nm.SetProperty(NetworkManagerInterface+".ConnectivityCheckEnabled", value)
+	return nm.SetProperty(NetworkManagerInterface+".ConnectivityCheckEnabled", dbus.MakeVariant(value))
 }
 
 // SetConnectivityCheckEnabled enables or disables connectivity checking.
@@ -407,7 +411,7 @@ func GlobalDNSConfiguration() (map[string]interface{}, error) {
 }
 
 func (nm *networkManager) SetGlobalDNSConfiguration(value map[string]interface{}) error {
-	return nm.SetProperty(NetworkManagerInterface+".GlobalDnsConfiguration", value)
+	return nm.SetProperty(NetworkManagerInterface+".GlobalDnsConfiguration", dbus.MakeVariant(value))
 }
 
 // SetGlobalDNSConfiguration sets the dictionary of global DNS settings where the key is one of "searches", "options" and "domains".

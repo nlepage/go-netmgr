@@ -18,6 +18,7 @@ type (
 
 		// Properties
 
+		// FIXME documentation
 		Devices() ([]Device, error)
 	}
 
