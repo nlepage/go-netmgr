@@ -5,7 +5,6 @@ package netmgrgql
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/nlepage/go-netmgr"
 	"github.com/nlepage/go-netmgr/gql/generated"
@@ -13,7 +12,21 @@ import (
 )
 
 func (r *mutationResolver) NetworkManager(ctx context.Context, input model.NetworkManagerInput) (netmgr.NetworkManager, error) {
-	panic(fmt.Errorf("not implemented"))
+	if input.WirelessEnabled != nil {
+		if err := netmgr.SetWirelessEnabled(*input.WirelessEnabled); err != nil {
+			return nil, err
+		}
+	}
+	if input.WwanEnabled != nil {
+		if err := netmgr.SetWwanEnabled(*input.WwanEnabled); err != nil {
+			return nil, err
+		}
+	}
+	nm, err := netmgr.System()
+	if err != nil {
+		return nil, err
+	}
+	return nm, nil
 }
 
 func (r *queryResolver) NetworkManager(ctx context.Context) (netmgr.NetworkManager, error) {

@@ -3,5 +3,6 @@
 package model
 
 type NetworkManagerInput struct {
-	WirelessEnabled bool `json:"wirelessEnabled"`
+	WirelessEnabled *bool `json:"wirelessEnabled"`
+	WwanEnabled     *bool `json:"wwanEnabled"`
 }

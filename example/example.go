@@ -1,15 +1,13 @@
 package main
 
 import (
-	"fmt"
-
+	"github.com/godbus/dbus/v5"
 	"github.com/nlepage/go-netmgr"
 )
 
 func main() {
-	connectivity, err := netmgr.Connectivity()
-	if err != nil {
-		panic(err)
+	if err := netmgr.SetWirelessEnabled(false); err != nil {
+		a := err.(dbus.Error)
+		println(a.Name)
 	}
-	fmt.Println(connectivity)
 }

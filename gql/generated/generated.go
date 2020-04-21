@@ -63,6 +63,11 @@ type ComplexityRoot struct {
 		ConnectivityCheckAvailable func(childComplexity int) int
 		ConnectivityCheckEnabled   func(childComplexity int) int
 		Devices                    func(childComplexity int) int
+		NetworkingEnabled          func(childComplexity int) int
+		WirelessEnabled            func(childComplexity int) int
+		WirelessHardwareEnabled    func(childComplexity int) int
+		WwanEnabled                func(childComplexity int) int
+		WwanHardwareEnabled        func(childComplexity int) int
 	}
 
 	Query struct {
@@ -160,6 +165,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.NetworkManager.Devices(childComplexity), true
 
+	case "NetworkManager.networkingEnabled":
+		if e.complexity.NetworkManager.NetworkingEnabled == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.NetworkingEnabled(childComplexity), true
+
+	case "NetworkManager.wirelessEnabled":
+		if e.complexity.NetworkManager.WirelessEnabled == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.WirelessEnabled(childComplexity), true
+
+	case "NetworkManager.wirelessHardwareEnabled":
+		if e.complexity.NetworkManager.WirelessHardwareEnabled == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.WirelessHardwareEnabled(childComplexity), true
+
+	case "NetworkManager.wwanEnabled":
+		if e.complexity.NetworkManager.WwanEnabled == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.WwanEnabled(childComplexity), true
+
+	case "NetworkManager.wwanHardwareEnabled":
+		if e.complexity.NetworkManager.WwanHardwareEnabled == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.WwanHardwareEnabled(childComplexity), true
+
 	case "Query.networkManager":
 		if e.complexity.Query.NetworkManager == nil {
 			break
@@ -243,13 +283,19 @@ type NetworkManager {
   devices: [Device!]!
   allDevices: [Device!]!
   checkpoints: [Checkpoint!]!
+  networkingEnabled: Boolean!
+  wirelessEnabled: Boolean!
+  wirelessHardwareEnabled: Boolean!
+  wwanEnabled: Boolean!
+  wwanHardwareEnabled: Boolean!
   connectivity: ConnectivityState!
   connectivityCheckAvailable: Boolean!
   connectivityCheckEnabled: Boolean!
 }
 
 input NetworkManagerInput {
-  wirelessEnabled: Boolean!
+  wirelessEnabled: Boolean
+  wwanEnabled: Boolean
 }
 
 type Device {
@@ -547,6 +593,176 @@ func (ec *executionContext) _NetworkManager_checkpoints(ctx context.Context, fie
 	res := resTmp.([]netmgr.Checkpoint)
 	fc.Result = res
 	return ec.marshalNCheckpoint2ᚕgithubᚗcomᚋnlepageᚋgoᚑnetmgrᚐCheckpointᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_networkingEnabled(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.NetworkingEnabled()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_wirelessEnabled(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WirelessEnabled()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_wirelessHardwareEnabled(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WirelessHardwareEnabled()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_wwanEnabled(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WwanEnabled()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_wwanHardwareEnabled(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WwanHardwareEnabled()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NetworkManager_connectivity(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
@@ -1817,7 +2033,13 @@ func (ec *executionContext) unmarshalInputNetworkManagerInput(ctx context.Contex
 		switch k {
 		case "wirelessEnabled":
 			var err error
-			it.WirelessEnabled, err = ec.unmarshalNBoolean2bool(ctx, v)
+			it.WirelessEnabled, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "wwanEnabled":
+			var err error
+			it.WwanEnabled, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -1943,6 +2165,31 @@ func (ec *executionContext) _NetworkManager(ctx context.Context, sel ast.Selecti
 			}
 		case "checkpoints":
 			out.Values[i] = ec._NetworkManager_checkpoints(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "networkingEnabled":
+			out.Values[i] = ec._NetworkManager_networkingEnabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "wirelessEnabled":
+			out.Values[i] = ec._NetworkManager_wirelessEnabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "wirelessHardwareEnabled":
+			out.Values[i] = ec._NetworkManager_wirelessHardwareEnabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "wwanEnabled":
+			out.Values[i] = ec._NetworkManager_wwanEnabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "wwanHardwareEnabled":
+			out.Values[i] = ec._NetworkManager_wwanHardwareEnabled(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}

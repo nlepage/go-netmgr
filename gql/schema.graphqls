@@ -10,13 +10,19 @@ type NetworkManager {
   devices: [Device!]!
   allDevices: [Device!]!
   checkpoints: [Checkpoint!]!
+  networkingEnabled: Boolean!
+  wirelessEnabled: Boolean!
+  wirelessHardwareEnabled: Boolean!
+  wwanEnabled: Boolean!
+  wwanHardwareEnabled: Boolean!
   connectivity: ConnectivityState!
   connectivityCheckAvailable: Boolean!
   connectivityCheckEnabled: Boolean!
 }
 
 input NetworkManagerInput {
-  wirelessEnabled: Boolean!
+  wirelessEnabled: Boolean
+  wwanEnabled: Boolean
 }
 
 type Device {
