@@ -20,7 +20,7 @@ func MarshalState(metered State) graphql.Marshaler {
 		case netmgr.StateAsleep:
 			s = "Asleep"
 		case netmgr.StateDisconnected:
-			s = "DisconnectedStateDisconnected"
+			s = "Disconnected"
 		case netmgr.StateDisconnecting:
 			s = "Disconnecting"
 		case netmgr.StateConnecting:
@@ -28,9 +28,9 @@ func MarshalState(metered State) graphql.Marshaler {
 		case netmgr.StateConnectedLocal:
 			s = "ConnectedLocal"
 		case netmgr.StateConnectedSite:
-			s = "ConStateConnectedSite"
+			s = "ConnectedSite"
 		case netmgr.StateConnectedGlobal:
-			s = "CoStateConnectedGlobal"
+			s = "ConnectedGlobal"
 		default:
 			panic("Unknown netmgr.StateEnum value: " + strconv.Itoa(int(metered)))
 		}
@@ -45,7 +45,7 @@ func UnmarshalState(v interface{}) (State, error) {
 		return netmgr.StateUnknown, nil
 	case "Asleep":
 		return netmgr.StateAsleep, nil
-	case "DisconnectedStateDisconnected":
+	case "DisconnectedState":
 		return netmgr.StateDisconnected, nil
 	case "Disconnecting":
 		return netmgr.StateDisconnecting, nil
