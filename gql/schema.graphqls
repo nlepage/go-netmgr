@@ -15,22 +15,64 @@ type NetworkManager {
   wirelessHardwareEnabled: Boolean!
   wwanEnabled: Boolean!
   wwanHardwareEnabled: Boolean!
+  activeConnections: [ConnectionActive]!
+  primaryConnection: ConnectionActive!
+  metered: Metered!
+  activatingConnection: ConnectionActive!
+  startup: Boolean!
+  version: String!
+  capabilities: [Capability]!
+  state: State!
   connectivity: ConnectivityState!
   connectivityCheckAvailable: Boolean!
   connectivityCheckEnabled: Boolean!
+  connectivityCheckURI: String!
+  # FIXME globalDNSConfiguration
 }
 
 input NetworkManagerInput {
   wirelessEnabled: Boolean
   wwanEnabled: Boolean
+  connectivityCheckEnabled: Boolean
+  # FIXME globalDNSConfiguration
 }
 
 type Device {
+  id: ID!
+  path: String!
   interface: String!
 }
 
 type Checkpoint {
   devices: [Device!]!
+}
+
+type ConnectionActive {
+  vpn: Boolean!
+}
+
+enum Metered {
+  Unknown
+  Yes
+  No
+  GuessYes
+  GuessNo
+}
+
+enum Capability {
+  Team
+  OVS
+}
+
+enum State {
+  Unknown
+  Asleep
+  Disconnected
+  Disconnecting
+  Connecting
+  ConnectedLocal
+  ConnectedSite
+  ConnectedGlobal
 }
 
 enum ConnectivityState {

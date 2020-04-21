@@ -12,6 +12,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
+	dbus "github.com/godbus/dbus/v5"
 	"github.com/nlepage/go-netmgr"
 	"github.com/nlepage/go-netmgr/gql/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
@@ -36,6 +37,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Device() DeviceResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 }
@@ -48,8 +50,14 @@ type ComplexityRoot struct {
 		Devices func(childComplexity int) int
 	}
 
+	ConnectionActive struct {
+		Vpn func(childComplexity int) int
+	}
+
 	Device struct {
+		ID        func(childComplexity int) int
 		Interface func(childComplexity int) int
+		Path      func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -57,13 +65,22 @@ type ComplexityRoot struct {
 	}
 
 	NetworkManager struct {
+		ActivatingConnection       func(childComplexity int) int
+		ActiveConnections          func(childComplexity int) int
 		AllDevices                 func(childComplexity int) int
+		Capabilities               func(childComplexity int) int
 		Checkpoints                func(childComplexity int) int
 		Connectivity               func(childComplexity int) int
 		ConnectivityCheckAvailable func(childComplexity int) int
 		ConnectivityCheckEnabled   func(childComplexity int) int
+		ConnectivityCheckURI       func(childComplexity int) int
 		Devices                    func(childComplexity int) int
+		Metered                    func(childComplexity int) int
 		NetworkingEnabled          func(childComplexity int) int
+		PrimaryConnection          func(childComplexity int) int
+		Startup                    func(childComplexity int) int
+		State                      func(childComplexity int) int
+		Version                    func(childComplexity int) int
 		WirelessEnabled            func(childComplexity int) int
 		WirelessHardwareEnabled    func(childComplexity int) int
 		WwanEnabled                func(childComplexity int) int
@@ -75,6 +92,9 @@ type ComplexityRoot struct {
 	}
 }
 
+type DeviceResolver interface {
+	ID(ctx context.Context, obj netmgr.Device) (string, error)
+}
 type MutationResolver interface {
 	NetworkManager(ctx context.Context, input model.NetworkManagerInput) (netmgr.NetworkManager, error)
 }
@@ -104,12 +124,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Checkpoint.Devices(childComplexity), true
 
+	case "ConnectionActive.vpn":
+		if e.complexity.ConnectionActive.Vpn == nil {
+			break
+		}
+
+		return e.complexity.ConnectionActive.Vpn(childComplexity), true
+
+	case "Device.id":
+		if e.complexity.Device.ID == nil {
+			break
+		}
+
+		return e.complexity.Device.ID(childComplexity), true
+
 	case "Device.interface":
 		if e.complexity.Device.Interface == nil {
 			break
 		}
 
 		return e.complexity.Device.Interface(childComplexity), true
+
+	case "Device.path":
+		if e.complexity.Device.Path == nil {
+			break
+		}
+
+		return e.complexity.Device.Path(childComplexity), true
 
 	case "Mutation.networkManager":
 		if e.complexity.Mutation.NetworkManager == nil {
@@ -123,12 +164,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.NetworkManager(childComplexity, args["input"].(model.NetworkManagerInput)), true
 
+	case "NetworkManager.activatingConnection":
+		if e.complexity.NetworkManager.ActivatingConnection == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.ActivatingConnection(childComplexity), true
+
+	case "NetworkManager.activeConnections":
+		if e.complexity.NetworkManager.ActiveConnections == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.ActiveConnections(childComplexity), true
+
 	case "NetworkManager.allDevices":
 		if e.complexity.NetworkManager.AllDevices == nil {
 			break
 		}
 
 		return e.complexity.NetworkManager.AllDevices(childComplexity), true
+
+	case "NetworkManager.capabilities":
+		if e.complexity.NetworkManager.Capabilities == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.Capabilities(childComplexity), true
 
 	case "NetworkManager.checkpoints":
 		if e.complexity.NetworkManager.Checkpoints == nil {
@@ -158,6 +220,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.NetworkManager.ConnectivityCheckEnabled(childComplexity), true
 
+	case "NetworkManager.connectivityCheckURI":
+		if e.complexity.NetworkManager.ConnectivityCheckURI == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.ConnectivityCheckURI(childComplexity), true
+
 	case "NetworkManager.devices":
 		if e.complexity.NetworkManager.Devices == nil {
 			break
@@ -165,12 +234,47 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.NetworkManager.Devices(childComplexity), true
 
+	case "NetworkManager.metered":
+		if e.complexity.NetworkManager.Metered == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.Metered(childComplexity), true
+
 	case "NetworkManager.networkingEnabled":
 		if e.complexity.NetworkManager.NetworkingEnabled == nil {
 			break
 		}
 
 		return e.complexity.NetworkManager.NetworkingEnabled(childComplexity), true
+
+	case "NetworkManager.primaryConnection":
+		if e.complexity.NetworkManager.PrimaryConnection == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.PrimaryConnection(childComplexity), true
+
+	case "NetworkManager.startup":
+		if e.complexity.NetworkManager.Startup == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.Startup(childComplexity), true
+
+	case "NetworkManager.state":
+		if e.complexity.NetworkManager.State == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.State(childComplexity), true
+
+	case "NetworkManager.version":
+		if e.complexity.NetworkManager.Version == nil {
+			break
+		}
+
+		return e.complexity.NetworkManager.Version(childComplexity), true
 
 	case "NetworkManager.wirelessEnabled":
 		if e.complexity.NetworkManager.WirelessEnabled == nil {
@@ -288,22 +392,64 @@ type NetworkManager {
   wirelessHardwareEnabled: Boolean!
   wwanEnabled: Boolean!
   wwanHardwareEnabled: Boolean!
+  activeConnections: [ConnectionActive]!
+  primaryConnection: ConnectionActive!
+  metered: Metered!
+  activatingConnection: ConnectionActive!
+  startup: Boolean!
+  version: String!
+  capabilities: [Capability]!
+  state: State!
   connectivity: ConnectivityState!
   connectivityCheckAvailable: Boolean!
   connectivityCheckEnabled: Boolean!
+  connectivityCheckURI: String!
+  # FIXME globalDNSConfiguration
 }
 
 input NetworkManagerInput {
   wirelessEnabled: Boolean
   wwanEnabled: Boolean
+  connectivityCheckEnabled: Boolean
+  # FIXME globalDNSConfiguration
 }
 
 type Device {
+  id: ID!
+  path: String!
   interface: String!
 }
 
 type Checkpoint {
   devices: [Device!]!
+}
+
+type ConnectionActive {
+  vpn: Boolean!
+}
+
+enum Metered {
+  Unknown
+  Yes
+  No
+  GuessYes
+  GuessNo
+}
+
+enum Capability {
+  Team
+  OVS
+}
+
+enum State {
+  Unknown
+  Asleep
+  Disconnected
+  Disconnecting
+  Connecting
+  ConnectedLocal
+  ConnectedSite
+  ConnectedGlobal
 }
 
 enum ConnectivityState {
@@ -416,6 +562,108 @@ func (ec *executionContext) _Checkpoint_devices(ctx context.Context, field graph
 	res := resTmp.([]netmgr.Device)
 	fc.Result = res
 	return ec.marshalNDevice2ᚕgithubᚗcomᚋnlepageᚋgoᚑnetmgrᚐDeviceᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ConnectionActive_vpn(ctx context.Context, field graphql.CollectedField, obj netmgr.ConnectionActive) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "ConnectionActive",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Vpn()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_id(ctx context.Context, field graphql.CollectedField, obj netmgr.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Device().ID(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNID2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Device_path(ctx context.Context, field graphql.CollectedField, obj netmgr.Device) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "Device",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Path(), nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(dbus.ObjectPath)
+	fc.Result = res
+	return ec.marshalNString2githubᚗcomᚋgodbusᚋdbusᚋv5ᚐObjectPath(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Device_interface(ctx context.Context, field graphql.CollectedField, obj netmgr.Device) (ret graphql.Marshaler) {
@@ -765,6 +1013,278 @@ func (ec *executionContext) _NetworkManager_wwanHardwareEnabled(ctx context.Cont
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _NetworkManager_activeConnections(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ActiveConnections()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]netmgr.ConnectionActive)
+	fc.Result = res
+	return ec.marshalNConnectionActive2ᚕgithubᚗcomᚋnlepageᚋgoᚑnetmgrᚐConnectionActive(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_primaryConnection(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PrimaryConnection()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(netmgr.ConnectionActive)
+	fc.Result = res
+	return ec.marshalNConnectionActive2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐConnectionActive(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_metered(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Metered()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(netmgr.MeteredEnum)
+	fc.Result = res
+	return ec.marshalNMetered2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐMeteredEnum(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_activatingConnection(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ActivatingConnection()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(netmgr.ConnectionActive)
+	fc.Result = res
+	return ec.marshalNConnectionActive2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐConnectionActive(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_startup(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Startup()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_version(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Version()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_capabilities(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Capabilities()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]netmgr.Capability)
+	fc.Result = res
+	return ec.marshalNCapability2ᚕgithubᚗcomᚋnlepageᚋgoᚑnetmgrᚐCapability(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_state(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.State()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(netmgr.StateEnum)
+	fc.Result = res
+	return ec.marshalNState2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐStateEnum(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _NetworkManager_connectivity(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -865,6 +1385,40 @@ func (ec *executionContext) _NetworkManager_connectivityCheckEnabled(ctx context
 	res := resTmp.(bool)
 	fc.Result = res
 	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _NetworkManager_connectivityCheckURI(ctx context.Context, field graphql.CollectedField, obj netmgr.NetworkManager) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:   "NetworkManager",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ConnectivityCheckURI()
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_networkManager(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2043,6 +2597,12 @@ func (ec *executionContext) unmarshalInputNetworkManagerInput(ctx context.Contex
 			if err != nil {
 				return it, err
 			}
+		case "connectivityCheckEnabled":
+			var err error
+			it.ConnectivityCheckEnabled, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -2084,6 +2644,33 @@ func (ec *executionContext) _Checkpoint(ctx context.Context, sel ast.SelectionSe
 	return out
 }
 
+var connectionActiveImplementors = []string{"ConnectionActive"}
+
+func (ec *executionContext) _ConnectionActive(ctx context.Context, sel ast.SelectionSet, obj netmgr.ConnectionActive) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, connectionActiveImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ConnectionActive")
+		case "vpn":
+			out.Values[i] = ec._ConnectionActive_vpn(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var deviceImplementors = []string{"Device"}
 
 func (ec *executionContext) _Device(ctx context.Context, sel ast.SelectionSet, obj netmgr.Device) graphql.Marshaler {
@@ -2095,10 +2682,29 @@ func (ec *executionContext) _Device(ctx context.Context, sel ast.SelectionSet, o
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Device")
+		case "id":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Device_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "path":
+			out.Values[i] = ec._Device_path(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "interface":
 			out.Values[i] = ec._Device_interface(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -2193,6 +2799,46 @@ func (ec *executionContext) _NetworkManager(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "activeConnections":
+			out.Values[i] = ec._NetworkManager_activeConnections(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "primaryConnection":
+			out.Values[i] = ec._NetworkManager_primaryConnection(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "metered":
+			out.Values[i] = ec._NetworkManager_metered(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "activatingConnection":
+			out.Values[i] = ec._NetworkManager_activatingConnection(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "startup":
+			out.Values[i] = ec._NetworkManager_startup(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "version":
+			out.Values[i] = ec._NetworkManager_version(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "capabilities":
+			out.Values[i] = ec._NetworkManager_capabilities(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "state":
+			out.Values[i] = ec._NetworkManager_state(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "connectivity":
 			out.Values[i] = ec._NetworkManager_connectivity(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -2205,6 +2851,11 @@ func (ec *executionContext) _NetworkManager(ctx context.Context, sel ast.Selecti
 			}
 		case "connectivityCheckEnabled":
 			out.Values[i] = ec._NetworkManager_connectivityCheckEnabled(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "connectivityCheckURI":
+			out.Values[i] = ec._NetworkManager_connectivityCheckURI(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2522,6 +3173,63 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNCapability2ᚕgithubᚗcomᚋnlepageᚋgoᚑnetmgrᚐCapability(ctx context.Context, v interface{}) ([]netmgr.Capability, error) {
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]netmgr.Capability, len(vSlice))
+	for i := range vSlice {
+		res[i], err = ec.unmarshalOCapability2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐCapability(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNCapability2ᚕgithubᚗcomᚋnlepageᚋgoᚑnetmgrᚐCapability(ctx context.Context, sel ast.SelectionSet, v []netmgr.Capability) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOCapability2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐCapability(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
 func (ec *executionContext) marshalNCheckpoint2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐCheckpoint(ctx context.Context, sel ast.SelectionSet, v netmgr.Checkpoint) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -2557,6 +3265,53 @@ func (ec *executionContext) marshalNCheckpoint2ᚕgithubᚗcomᚋnlepageᚋgoᚑ
 				defer wg.Done()
 			}
 			ret[i] = ec.marshalNCheckpoint2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐCheckpoint(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNConnectionActive2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐConnectionActive(ctx context.Context, sel ast.SelectionSet, v netmgr.ConnectionActive) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ConnectionActive(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNConnectionActive2ᚕgithubᚗcomᚋnlepageᚋgoᚑnetmgrᚐConnectionActive(ctx context.Context, sel ast.SelectionSet, v []netmgr.ConnectionActive) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOConnectionActive2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐConnectionActive(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2630,6 +3385,34 @@ func (ec *executionContext) marshalNDevice2ᚕgithubᚗcomᚋnlepageᚋgoᚑnetm
 	return ret
 }
 
+func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
+	return graphql.UnmarshalID(v)
+}
+
+func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNMetered2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐMeteredEnum(ctx context.Context, v interface{}) (netmgr.MeteredEnum, error) {
+	return model.UnmarshalMetered(v)
+}
+
+func (ec *executionContext) marshalNMetered2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐMeteredEnum(ctx context.Context, sel ast.SelectionSet, v netmgr.MeteredEnum) graphql.Marshaler {
+	res := model.MarshalMetered(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) marshalNNetworkManager2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐNetworkManager(ctx context.Context, sel ast.SelectionSet, v netmgr.NetworkManager) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -2642,6 +3425,35 @@ func (ec *executionContext) marshalNNetworkManager2githubᚗcomᚋnlepageᚋgo�
 
 func (ec *executionContext) unmarshalNNetworkManagerInput2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚋgqlᚋmodelᚐNetworkManagerInput(ctx context.Context, v interface{}) (model.NetworkManagerInput, error) {
 	return ec.unmarshalInputNetworkManagerInput(ctx, v)
+}
+
+func (ec *executionContext) unmarshalNState2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐStateEnum(ctx context.Context, v interface{}) (netmgr.StateEnum, error) {
+	return model.UnmarshalState(v)
+}
+
+func (ec *executionContext) marshalNState2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐStateEnum(ctx context.Context, sel ast.SelectionSet, v netmgr.StateEnum) graphql.Marshaler {
+	res := model.MarshalState(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNString2githubᚗcomᚋgodbusᚋdbusᚋv5ᚐObjectPath(ctx context.Context, v interface{}) (dbus.ObjectPath, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	return dbus.ObjectPath(tmp), err
+}
+
+func (ec *executionContext) marshalNString2githubᚗcomᚋgodbusᚋdbusᚋv5ᚐObjectPath(ctx context.Context, sel ast.SelectionSet, v dbus.ObjectPath) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -2905,6 +3717,21 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return ec.marshalOBoolean2bool(ctx, sel, *v)
+}
+
+func (ec *executionContext) unmarshalOCapability2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐCapability(ctx context.Context, v interface{}) (netmgr.Capability, error) {
+	return model.UnmarshalCapability(v)
+}
+
+func (ec *executionContext) marshalOCapability2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐCapability(ctx context.Context, sel ast.SelectionSet, v netmgr.Capability) graphql.Marshaler {
+	return model.MarshalCapability(v)
+}
+
+func (ec *executionContext) marshalOConnectionActive2githubᚗcomᚋnlepageᚋgoᚑnetmgrᚐConnectionActive(ctx context.Context, sel ast.SelectionSet, v netmgr.ConnectionActive) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ConnectionActive(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2string(ctx context.Context, v interface{}) (string, error) {
