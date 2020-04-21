@@ -12,16 +12,16 @@ import (
 	"github.com/nlepage/go-netmgr/gql/model"
 )
 
-func (r *mutationResolver) NetworkManager(ctx context.Context, input model.NetworkManagerInput) (*model.NetworkManager, error) {
+func (r *mutationResolver) NetworkManager(ctx context.Context, input model.NetworkManagerInput) (netmgr.NetworkManager, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) NetworkManager(ctx context.Context) (*model.NetworkManager, error) {
+func (r *queryResolver) NetworkManager(ctx context.Context) (netmgr.NetworkManager, error) {
 	nm, err := netmgr.System()
 	if err != nil {
 		return nil, err
 	}
-	return &model.NetworkManager{nm}, nil
+	return nm, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

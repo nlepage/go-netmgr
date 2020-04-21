@@ -36,6 +36,7 @@ resolver:
 # if they match it will use them, otherwise it will generate them.
 autobind:
   - "github.com/nlepage/go-netmgr/gql/model"
+  - "github.com/nlepage/go-netmgr"
 
 # This section declares type mapping between the GraphQL and go type systems
 #
@@ -54,5 +55,3 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
-  ConnectivityState:
-    model: github.com/nlepage/go-netmgr/gql/model.ConnectivityState

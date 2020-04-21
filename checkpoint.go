@@ -15,6 +15,10 @@ type (
 	// See https://developer.gnome.org/NetworkManager/stable/gdbus-org.freedesktop.NetworkManager.Checkpoint.html for more information.
 	Checkpoint interface {
 		dbus.BusObject
+
+		// Properties
+
+		Devices() ([]Device, error)
 	}
 
 	checkpoint struct {
@@ -36,4 +40,12 @@ func NewCheckpoints(conn *dbus.Conn, paths []dbus.ObjectPath) []Checkpoint {
 		checkpoints[i] = NewCheckpoint(conn, path)
 	}
 	return checkpoints
+}
+
+func (c *checkpoint) Devices() ([]Device, error) {
+	paths, err := c.GetAOProperty(CheckpointIface + ".Devices")
+	if err != nil {
+		return nil, err
+	}
+	return NewDevices(c.Conn, paths), nil
 }

@@ -1,4 +1,15 @@
+type Query {
+  networkManager: NetworkManager!
+}
+
+type Mutation {
+  networkManager(input: NetworkManagerInput!): NetworkManager!
+}
+
 type NetworkManager {
+  devices: [Device!]!
+  allDevices: [Device!]!
+  checkpoints: [Checkpoint!]!
   connectivity: ConnectivityState!
   connectivityCheckAvailable: Boolean!
   connectivityCheckEnabled: Boolean!
@@ -8,12 +19,12 @@ input NetworkManagerInput {
   wirelessEnabled: Boolean!
 }
 
-type Query {
-  networkManager: NetworkManager!
+type Device {
+  interface: String!
 }
 
-type Mutation {
-  networkManager(input: NetworkManagerInput!): NetworkManager!
+type Checkpoint {
+  devices: [Device!]!
 }
 
 enum ConnectivityState {

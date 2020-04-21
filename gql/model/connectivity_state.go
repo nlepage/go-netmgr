@@ -10,7 +10,9 @@ import (
 	"github.com/nlepage/go-netmgr"
 )
 
-func MarshalConnectivityState(connectivity netmgr.ConnectivityState) graphql.Marshaler {
+type ConnectivityState = netmgr.ConnectivityState
+
+func MarshalConnectivityState(connectivity ConnectivityState) graphql.Marshaler {
 	return graphql.WriterFunc(func(w io.Writer) {
 		var s string
 		switch connectivity {
@@ -31,7 +33,7 @@ func MarshalConnectivityState(connectivity netmgr.ConnectivityState) graphql.Mar
 	})
 }
 
-func UnmarshalConnectivityState(v interface{}) (netmgr.ConnectivityState, error) {
+func UnmarshalConnectivityState(v interface{}) (ConnectivityState, error) {
 	s := v.(string)
 	switch s {
 	case "Unknown":
