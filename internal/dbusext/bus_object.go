@@ -1,6 +1,9 @@
 package dbusext
 
 import (
+	"errors"
+	"reflect"
+
 	"github.com/godbus/dbus/v5"
 )
 
@@ -8,14 +11,13 @@ type (
 	BusObject struct {
 		dbus.BusObject
 		Conn *dbus.Conn
-		sm   *signalManager
 	}
 
 	Args = []interface{}
 )
 
 func NewBusObject(conn *dbus.Conn, busName string, path dbus.ObjectPath) BusObject {
-	return BusObject{conn.Object(busName, path), conn, newSignalManager(conn)}
+	return BusObject{conn.Object(busName, path), conn}
 }
 
 func (o *BusObject) CallAndStore(method string, in Args, out Args) error {
@@ -26,9 +28,24 @@ func (o *BusObject) CallAndStore(method string, in Args, out Args) error {
 	return call.Store(out...)
 }
 
-// FIXME useful?
-func (o *BusObject) Signal(iface string, member string, out chan<- []interface{}) error {
-	return o.sm.Signal(iface, member, o.Path(), out)
+func (o *BusObject) SignalDispatcher() (*SignalDispatcher, error) {
+	v := o.Conn.Context().Value(SignalDispatcherKey)
+	if v == nil {
+		return nil, errors.New("no SignalDispatcher is attached to the DBus connection, use netmgrutil.WithSignalDispatcher")
+	}
+	return v.(*SignalDispatcher), nil
+}
+
+func (o *BusObject) Signal(iface string, member string, out interface{}, elemType reflect.Type) error {
+	sd, err := o.SignalDispatcher()
+	if err != nil {
+		return err
+	}
+	return sd.Signal(o.Conn, o.Path(), iface, member, out, elemType)
+}
+
+func (o *BusObject) USignal(iface string, member string, out interface{}) error {
+	return o.Signal(iface, member, out, reflect.TypeOf(uint32(0)))
 }
 
 func (o *BusObject) GetSProperty(name string) (string, error) {

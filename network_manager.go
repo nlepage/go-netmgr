@@ -4,6 +4,7 @@ import (
 	"github.com/godbus/dbus/v5"
 
 	"github.com/nlepage/go-netmgr/internal/dbusext"
+	netmgrutil "github.com/nlepage/go-netmgr/util"
 )
 
 // BusName of NetworkManager.
@@ -45,6 +46,7 @@ type (
 		CheckpointAdjustRollbackTimeout(checkpoint interface{}, rollbackTimeout uint) error
 
 		// FIXME Signals
+		StateChanged(ch chan<- StateEnum) error
 
 		// Properties
 
@@ -91,13 +93,13 @@ func New(conn *dbus.Conn) NetworkManager {
 // System returns the Connection Manager from the system bus.
 //
 // It is equivalent to:
-//  conn, err := dbus.SystemBus()
+//  conn, err := netmgrutil.SystemBus()
 //  if err != nil {
 //      // Manager error
 //  }
 //  nm := netmgr.New(conn)
 func System() (NetworkManager, error) {
-	conn, err := dbus.SystemBus()
+	conn, err := netmgrutil.SystemBus()
 	if err != nil {
 		return nil, err
 	}
