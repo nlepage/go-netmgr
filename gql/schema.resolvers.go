@@ -53,6 +53,14 @@ func (r *queryResolver) NetworkManager(ctx context.Context) (netmgr.NetworkManag
 	return nm, nil
 }
 
+func (r *subscriptionResolver) NetworkManagerStateChanged(ctx context.Context) (<-chan netmgr.StateEnum, error) {
+	ch := make(chan netmgr.StateEnum)
+	if err := netmgr.StateChanged(ch); err != nil {
+		return nil, err
+	}
+	return ch, nil
+}
+
 // Device returns generated.DeviceResolver implementation.
 func (r *Resolver) Device() generated.DeviceResolver { return &deviceResolver{r} }
 
@@ -62,6 +70,10 @@ func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResol
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+// Subscription returns generated.SubscriptionResolver implementation.
+func (r *Resolver) Subscription() generated.SubscriptionResolver { return &subscriptionResolver{r} }
+
 type deviceResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type subscriptionResolver struct{ *Resolver }

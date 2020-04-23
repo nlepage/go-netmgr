@@ -6,6 +6,10 @@ type Mutation {
   networkManager(input: NetworkManagerInput!): NetworkManager!
 }
 
+type Subscription {
+  networkManagerStateChanged: State!
+}
+
 type NetworkManager {
   devices: [Device!]!
   allDevices: [Device!]!
