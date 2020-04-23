@@ -54,6 +54,7 @@ func (r *queryResolver) NetworkManager(ctx context.Context) (netmgr.NetworkManag
 }
 
 func (r *subscriptionResolver) NetworkManagerStateChanged(ctx context.Context) (<-chan netmgr.StateEnum, error) {
+	// FIXME remove signal and close on ctx.Done
 	ch := make(chan netmgr.StateEnum)
 	if err := netmgr.StateChanged(ch); err != nil {
 		return nil, err
