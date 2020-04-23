@@ -6,7 +6,9 @@ import (
 
 func main() {
 	state := make(chan netmgr.StateEnum)
-	netmgr.StateChanged(state)
+	if err := netmgr.StateChanged(state); err != nil {
+		panic(err)
+	}
 	for s := range state {
 		println(s)
 	}

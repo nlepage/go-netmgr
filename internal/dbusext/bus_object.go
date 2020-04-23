@@ -36,16 +36,16 @@ func (o *BusObject) SignalDispatcher() (*SignalDispatcher, error) {
 	return v.(*SignalDispatcher), nil
 }
 
-func (o *BusObject) Signal(iface string, member string, out interface{}, elemType reflect.Type) error {
+func (o *BusObject) Signal(iface string, member string, elemType reflect.Type, out interface{}, convert interface{}) error {
 	sd, err := o.SignalDispatcher()
 	if err != nil {
 		return err
 	}
-	return sd.Signal(o.Conn, o.Path(), iface, member, out, elemType)
+	return sd.Signal(o.Conn, o.Path(), iface, member, elemType, out, convert)
 }
 
-func (o *BusObject) USignal(iface string, member string, out interface{}) error {
-	return o.Signal(iface, member, out, reflect.TypeOf(uint32(0)))
+func (o *BusObject) USignal(iface string, member string, out interface{}, convert interface{}) error {
+	return o.Signal(iface, member, reflect.TypeOf(uint32(0)), out, convert)
 }
 
 func (o *BusObject) GetSProperty(name string) (string, error) {

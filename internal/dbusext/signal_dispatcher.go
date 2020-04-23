@@ -15,15 +15,15 @@ type (
 		name string
 	}
 
-	chanInfo struct {
-		value       reflect.Value
-		elementType reflect.Type
+	outChan struct {
+		value   reflect.Value
+		convert func(interface{}) reflect.Value
 	}
 
 	SignalDispatcher struct {
 		l    sync.RWMutex
 		in   <-chan *dbus.Signal
-		outs map[SignalKey]map[interface{}]chanInfo
+		outs map[SignalKey]map[interface{}]outChan
 	}
 )
 
@@ -31,19 +31,14 @@ var SignalDispatcherKey = struct{}{}
 
 func NewSignalDispatcher() *SignalDispatcher {
 	return &SignalDispatcher{
-		outs: make(map[SignalKey]map[interface{}]chanInfo),
+		outs: make(map[SignalKey]map[interface{}]outChan),
 	}
 }
 
-func (sm *SignalDispatcher) Signal(conn *dbus.Conn, path dbus.ObjectPath, iface, member string, out interface{}, elemType reflect.Type) error {
-	outType := reflect.TypeOf(out)
-	if outType.Kind() != reflect.Chan {
-		return errors.New("out is not a chan")
-	}
-
-	outElemType := outType.Elem()
-	if !elemType.ConvertibleTo(outElemType) {
-		return fmt.Errorf("%s is not convertible to %s", elemType, outElemType)
+func (sm *SignalDispatcher) Signal(conn *dbus.Conn, path dbus.ObjectPath, iface, member string, elemType reflect.Type, out interface{}, convert interface{}) error {
+	oc, err := newOutChan(out, elemType, convert)
+	if err != nil {
+		return err
 	}
 
 	sm.l.Lock()
@@ -59,7 +54,7 @@ func (sm *SignalDispatcher) Signal(conn *dbus.Conn, path dbus.ObjectPath, iface,
 	var k = SignalKey{path, iface + "." + member}
 
 	if _, ok := sm.outs[k]; !ok {
-		sm.outs[k] = make(map[interface{}]chanInfo)
+		sm.outs[k] = make(map[interface{}]outChan)
 		if err := conn.AddMatchSignal(
 			dbus.WithMatchObjectPath(path),
 			dbus.WithMatchInterface(iface),
@@ -69,16 +64,11 @@ func (sm *SignalDispatcher) Signal(conn *dbus.Conn, path dbus.ObjectPath, iface,
 		}
 	}
 	if _, ok := sm.outs[k][out]; !ok {
-		sm.outs[k][out] = chanInfo{
-			reflect.ValueOf(out),
-			outElemType,
-		}
+		sm.outs[k][out] = oc
 	}
 
 	return nil
 }
-
-// FIXME RemoveSignal
 
 func (sm *SignalDispatcher) pipe(done <-chan struct{}) {
 	for {
@@ -98,8 +88,51 @@ func (sm *SignalDispatcher) pipeSignal(s *dbus.Signal) {
 	if outs, ok := sm.outs[SignalKey{s.Path, s.Name}]; ok {
 		for _, ch := range outs {
 			for _, v := range s.Body {
-				ch.value.Send(reflect.ValueOf(v).Convert(ch.elementType))
+				ch.Send(v)
 			}
 		}
 	}
+}
+
+func newOutChan(ch interface{}, inType reflect.Type, convert interface{}) (outChan, error) {
+	chType := reflect.TypeOf(ch)
+	if chType.Kind() != reflect.Chan {
+		return outChan{}, errors.New("ch is not a chan")
+	}
+
+	oc := outChan{
+		value: reflect.ValueOf(ch),
+	}
+
+	chElemType := chType.Elem()
+	if convert != nil {
+		convertType := reflect.TypeOf(convert)
+		if convertType.Kind() != reflect.Func {
+			return outChan{}, errors.New("convert is not a func")
+		}
+		if convertType.NumIn() != 1 || convertType.In(0) != inType || convertType.NumOut() != 1 || convertType.Out(0) != chElemType {
+			return outChan{}, fmt.Errorf("convert type should be func(%s) %s", inType, chElemType)
+		}
+		convertValue := reflect.ValueOf(convert)
+		oc.convert = func(v interface{}) reflect.Value {
+			return convertValue.Call([]reflect.Value{reflect.ValueOf(v)})[0]
+		}
+	} else {
+		if chElemType == inType {
+			oc.convert = reflect.ValueOf
+		} else {
+			if !inType.ConvertibleTo(chElemType) {
+				return outChan{}, fmt.Errorf("%s is not convertible to %s", inType, chElemType)
+			}
+			oc.convert = func(v interface{}) reflect.Value {
+				return reflect.ValueOf(v).Convert(chElemType)
+			}
+		}
+	}
+
+	return oc, nil
+}
+
+func (oc outChan) Send(v interface{}) {
+	oc.value.Send(oc.convert(v))
 }
