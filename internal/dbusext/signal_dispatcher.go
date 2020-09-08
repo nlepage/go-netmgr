@@ -36,11 +36,6 @@ func NewSignalDispatcher() *SignalDispatcher {
 }
 
 func (sm *SignalDispatcher) Signal(conn *dbus.Conn, path dbus.ObjectPath, iface, member string, elemType reflect.Type, out interface{}, convert interface{}) error {
-	oc, err := newOutChan(out, elemType, convert)
-	if err != nil {
-		return err
-	}
-
 	sm.l.Lock()
 	defer sm.l.Unlock()
 
@@ -54,7 +49,6 @@ func (sm *SignalDispatcher) Signal(conn *dbus.Conn, path dbus.ObjectPath, iface,
 	var k = SignalKey{path, iface + "." + member}
 
 	if _, ok := sm.outs[k]; !ok {
-		sm.outs[k] = make(map[interface{}]outChan)
 		if err := conn.AddMatchSignal(
 			dbus.WithMatchObjectPath(path),
 			dbus.WithMatchInterface(iface),
@@ -62,8 +56,14 @@ func (sm *SignalDispatcher) Signal(conn *dbus.Conn, path dbus.ObjectPath, iface,
 		); err != nil {
 			return err
 		}
+		sm.outs[k] = make(map[interface{}]outChan)
 	}
 	if _, ok := sm.outs[k][out]; !ok {
+		oc, err := newOutChan(out, elemType, convert)
+		if err != nil {
+			return err
+		}
+
 		sm.outs[k][out] = oc
 	}
 
